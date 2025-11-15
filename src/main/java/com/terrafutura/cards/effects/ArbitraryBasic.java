@@ -8,33 +8,31 @@ import java.util.List;
 public class ArbitraryBasic implements Effect {
     private final int from;
     private final List<Resource> to;
-    private final int pollution;
 
-    public ArbitraryBasic(int from, List<Resource> resources, int pollution) {
+    public ArbitraryBasic(int from, List<Resource> resources) {
         this.from = from;
         to = resources;
-        this.pollution = pollution;
     }
 
     @Override
     public boolean check(List<Resource> input, List<Resource> output, int pollution) {
-        if (input.size() >= from) {
+        if (input.size() >= from && pollution == 0) {
+            if (input.contains(Resource.Pollution)) return false;
             output.addAll(to);
-            pollution += this.pollution;
             return true;
         }
         else return false;
     }
 
     @Override
-    public boolean hasAssistance() {
-        // TODO neviem co to robi
-        return false;
-    }
-
-    //TODO neviem co robi
-    @Override
     public String state() {
-        return "";
+        StringBuilder s = new StringBuilder();
+        s.append("[(");
+        s.append("any ").append(from).append(" resources) -> (");
+        for (Resource r : to) {
+            s.append(r).append(", ");
+        }
+        s.append(")]");
+        return s.toString();
     }
 }
