@@ -12,7 +12,7 @@ import java.util.List;
  * Special validation rules for starting card effect copying
  */
 public class ProcessActionAssistance {
-    private ActionHelper helper = new ActionHelper();
+    private final ActionHelper helper = new ActionHelper();
 
     /**
      * VALIDATES if assistance activation is possible
@@ -43,7 +43,7 @@ public class ProcessActionAssistance {
         }
 
         // Card we're copying must be activatable
-        if (!isCardActivatable(assistingCard, grid)) {
+        if (!isCardActivatable(assistingCard)) {
             return false;
         }
 
@@ -79,7 +79,7 @@ public class ProcessActionAssistance {
     /**
      * CHECKS if card is activatable (not locked by pollution, etc.)
      */
-    private boolean isCardActivatable(Card card, Grid grid){
+    private boolean isCardActivatable(Card card){
         return !card.getResources().isEmpty() && card.canGetResources(card.getResources());
     }
 }

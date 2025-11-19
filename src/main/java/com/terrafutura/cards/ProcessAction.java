@@ -11,7 +11,7 @@ import java.util.List;
  * ONLY CHECKS if activation is possible - DOES NOT EXECUTE any changes
  */
 public class ProcessAction {
-    private ActionHelper helper = new ActionHelper();
+    private final ActionHelper helper = new ActionHelper();
 
     /**
      * VALIDATES if card activation is possible
