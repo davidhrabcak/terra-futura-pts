@@ -25,7 +25,7 @@ public interface Effect {
     }
 
     /**
-     * Return the effect description [(INPUT RESOURCES) -> (OUTPUT RESOURCES)]
+     * Return  the effect description [(INPUT RESOURCES) -> (OUTPUT RESOURCES)]
      * @return string that describes function of effect
      */
     String state();
