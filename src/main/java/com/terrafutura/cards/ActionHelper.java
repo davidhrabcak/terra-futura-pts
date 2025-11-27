@@ -6,6 +6,7 @@ import main.java.com.terrafutura.resources.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Helper class containing common validation logic for ProcessAction and ProcessActionAssistance
@@ -31,8 +32,8 @@ public class ActionHelper {
             if (!grid.canPutCard(position)) {
                 return false; // Invalid position
             }
-            Card card = grid.getCard(position);
-            if (card == null || !card.canGetResources(List.of(resource))) {
+            Optional<Card> cardOpt = grid.getCard(position);
+            if (cardOpt.isEmpty() || !cardOpt.get().canGetResources(List.of(resource))) {
                 return false; // Cannot get resources
             }
         }
@@ -49,8 +50,8 @@ public class ActionHelper {
             if (!grid.canPutCard(position)) {
                 return false; // Invalid position
             }
-            Card card = grid.getCard(position);
-            if (card == null || !card.canPutResources(List.of(resource))) {
+            Optional<Card> cardOpt = grid.getCard(position);
+            if (cardOpt.isEmpty() || !cardOpt.get().canPutResources(List.of(resource))) {
                 return false; // Cannot add resources
             }
         }
@@ -65,7 +66,8 @@ public class ActionHelper {
             if (!grid.canPutCard(position)) {
                 return false; // Invalid position
             }
-            if (grid.getCard(position) == null) {
+            Optional<Card> cardOpt = grid.getCard(position);
+            if (cardOpt.isEmpty()) {
                 return false; // No card at position
             }
         }
@@ -74,7 +76,7 @@ public class ActionHelper {
 
     /**
      * VALIDATES transformation using card.check() method
-     * VERIFIES if card supports the transformation, but DOES NOT execute it
+     * VERIFIES if the card supports the transformation but DOES NOT execute it
      */
     public boolean validTransaction(Card card, List<Pair<Resource, GridPosition>> inputs,
                                     List<Pair<Resource, GridPosition>> outputs, List<GridPosition> pollution) {
