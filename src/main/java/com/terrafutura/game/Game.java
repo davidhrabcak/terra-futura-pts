@@ -16,11 +16,14 @@ public class Game {
 
 
     public Game(int playerNumber, int startingPlayerIndex) {
+        state = null;
         this.players = new ArrayList<>();
         for (int i = 1; i <= playerNumber; i++) {
             Player p = setupPlayer(i);
             players.add(p);
-
+            onTurn = startingPlayerIndex;
+            startingPlayer = startingPlayerIndex;
+            turnNumber = 1;
         }
     }
 
@@ -29,9 +32,5 @@ public class Game {
         ActivationPatterns a = new ActivationPatterns(g);
         ScoringMethods s = new ScoringMethods();
         return new Player(id, s.getRandomScoringMethod(), s.getRandomScoringMethod(), a.getRandomActivationPattern(), a.getRandomActivationPattern(), g);
-    }
-
-    public void nextState() {
-
     }
 }
