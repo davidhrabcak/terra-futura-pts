@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public class Pile {
     public Optional<Card> getCard(int index) { return Optional.empty(); }
-    public void takeCard(int index) {}
-    public void removeLastCard() {}
+    public Optional<Card> takeCard(int index) {return Optional.empty(); }
+    public boolean removeLastCard() {}
     public String state() { return ""; }
 }
