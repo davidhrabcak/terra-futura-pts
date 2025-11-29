@@ -10,6 +10,7 @@ public class SelectReward {
     private Optional<Integer> playerId;
     private  List<Resource> selection;
     private Card card;
+    public Resource selected = null;
 
     public SelectReward() {
         playerId = Optional.empty();
@@ -25,7 +26,16 @@ public class SelectReward {
     }
 
     public boolean canSelectReward(Resource resource) {
+        if (playerId.isEmpty()) return false;
+        return selection.contains(resource);
+    }
 
+    public Resource selectReward(Resource resource) {
+        if (playerId.isEmpty() || !selection.contains(resource)) return null;
+        else {
+            selected = resource;
+            return resource;
+        }
     }
 
 }
