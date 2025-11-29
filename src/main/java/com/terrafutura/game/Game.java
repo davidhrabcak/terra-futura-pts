@@ -9,7 +9,7 @@ import main.java.com.terrafutura.piles.*;
 import main.java.com.terrafutura.resources.Resource;
 
 import java.util.*;
-
+// TODO change state transitions to specification
 public class Game implements TerraFuturaInterface {
     private GameState state;
     public final List<Player> players;
@@ -19,10 +19,10 @@ public class Game implements TerraFuturaInterface {
     private final GameObserver observers;
 
 
-    public Game(int playerNumber, int startingPlayerIndex, List<GameObserver> observers) {
+    public Game(int playerNumber, int startingPlayerIndex, List<GameObserver> observers, long seed) {
         selectReward = null;
-        i = new Pile(); // mock use - in real implementation, the actual cards
-        ii = new Pile();// would be stored in some data class
+        i = new Pile(seed); // mock use - in real implementation, the actual cards
+        ii = new Pile(seed);// would be stored in some data class
         if (playerNumber < 2 || playerNumber > 4) {
             throw new IllegalArgumentException("Game: Invalid number of players");
         }

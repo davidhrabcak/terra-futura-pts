@@ -2,40 +2,46 @@ package main.java.com.terrafutura.piles;
 
 import main.java.com.terrafutura.cards.Card;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 public class Pile {
     private final List<Card> pile;
     List<Optional<Card>> visibleCards; // visibleCards are not in pile anymore
 
-    public Pile() { // for testing
+    public Pile(long seed) { // for testing
+        Random r = new Random(seed);
         pile = new ArrayList<>();
         visibleCards = new ArrayList<>();
-        Collections.shuffle(pile);
+        Collections.shuffle(pile, r);
         initializePile();
     }
 
-    public Pile(Card ... cards) {
+    public Pile(long seed, Card ... cards) {
         pile = new ArrayList<>(List.of(cards));
+        Random r = new Random(seed);
         visibleCards = new ArrayList<>();
-        Collections.shuffle(pile);
+        Collections.shuffle(pile, r);
         initializePile();
     }
 
     private void initializePile() {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             visibleCards.addFirst(Optional.of(pile.removeLast()));
         }
     }
 
     public Optional<Card> getCard(int index) {
-        if (index > visibleCards.size()) return Optional.empty();
+        if (index > visibleCards.size()-1) return Optional.empty();
         return visibleCards.get(index);
     }
 
     public Optional<Card> takeCard(int index) {
-        if (index > visibleCards.size()) return Optional.empty();
-        return visibleCards.remove(index);
+        if (index > visibleCards.size()-1 ) return Optional.empty();
+        Optional<Card> removed = visibleCards.remove(index);
+        if (pile.isEmpty()) visibleCards.add(Optional.empty());
+        else visibleCards.addFirst(Optional.of(pile.removeLast()));
+        return removed;
     }
 
     public boolean removeLastCard() {
