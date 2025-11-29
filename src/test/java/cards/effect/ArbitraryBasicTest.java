@@ -1,14 +1,11 @@
-package test.java.effect;
+package test.java.cards.effect;
 
 import main.java.com.terrafutura.cards.effects.ArbitraryBasic;
 import main.java.com.terrafutura.resources.Resource;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import java.util.*;
 
 import static org.junit.Assert.*;
 

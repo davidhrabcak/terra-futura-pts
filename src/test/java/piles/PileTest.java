@@ -36,13 +36,11 @@ public class PileTest {
     public void testInitializationTakesThreeCards() {
         Pile pile = new Pile(123, c("A"), c("B"), c("C"), c("D"), c("E"));
 
-        // visible should contain exactly 3 cards
         assertNotEquals(Optional.empty(), pile.takeCard(3));
     }
 
     @Test
     public void testVisibleCardsOrderAfterInitialization() {
-        // Cards in fixed order → shuffled deterministically - last three become visible
         Card A = c("A");
         Card B = c("B");
         Card C = c("C");
@@ -50,9 +48,6 @@ public class PileTest {
         Card E = c("E");
 
         Pile pile = new Pile(777, A, B, C, D, E);
-
-        // visibleCards.addFirst(last), three times
-        // So visible order should be: [third_removed, second_removed, first_removed]
 
         Optional<Card> first = pile.getCard(0);
         Optional<Card> second = pile.getCard(1);

@@ -30,11 +30,11 @@ public class SelectReward {
         return selection.contains(resource);
     }
 
-    public Resource selectReward(Resource resource) {
-        if (playerId.isEmpty() || !selection.contains(resource)) return null;
-        else {
-            selected = resource;
-            return resource;
+    public void selectReward(Resource resource) {
+        if (playerId.isPresent() && selection.contains(resource)
+                && canSelectReward(resource)) {
+        selected = resource;
+        selection.remove(resource);
         }
     }
 
@@ -42,7 +42,7 @@ public class SelectReward {
         StringBuilder s = new StringBuilder(20);
         s.append("Select a reward: ");
         for (Resource r : selection) {
-            s.append(r).append(", ");
+            s.append(r).append(" ");
         }
         s.append('\n');
         return s.toString();

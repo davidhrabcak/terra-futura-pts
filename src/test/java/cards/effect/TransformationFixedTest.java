@@ -1,4 +1,4 @@
-package test.java.effect;
+package test.java.cards.effect;
 
 import main.java.com.terrafutura.cards.effects.TransformationFixed;
 import main.java.com.terrafutura.resources.Resource;
