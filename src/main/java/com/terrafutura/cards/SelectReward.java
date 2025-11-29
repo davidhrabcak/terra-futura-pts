@@ -38,4 +38,14 @@ public class SelectReward {
         }
     }
 
+    public String state() {
+        StringBuilder s = new StringBuilder(20);
+        s.append("Select a reward: ");
+        for (Resource r : selection) {
+            s.append(r).append(", ");
+        }
+        s.append('\n');
+        return s.toString();
+    }
+
 }
