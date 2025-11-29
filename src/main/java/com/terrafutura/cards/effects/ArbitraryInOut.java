@@ -18,6 +18,11 @@ public class ArbitraryInOut implements Effect {
         this.out = out;
     }
 
+    public ArbitraryInOut(int in, int out, boolean hasAssistance) {
+        this.in = in;
+        this.out = out;
+    }
+
     @Override
     public boolean check(List<Resource> desiredInput, List<Resource> desiredOutput, int pollution) {
         return desiredInput.size() == in && desiredOutput.size() == out && pollution == 0;

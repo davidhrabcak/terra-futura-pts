@@ -19,6 +19,11 @@ public class TransformationFixed implements Effect {
         to = List.of(Car);
     }
 
+    public TransformationFixed(List<Resource> from, List<Resource> to, int pollution) {
+        this.from = new ArrayList<>(from);
+        this.to = new ArrayList<>(to);
+    }
+
     public TransformationFixed(List<Resource> from, List<Resource> to, int pollution, boolean hasAssistance) {
         this.from = new ArrayList<>(from);
         this.to = new ArrayList<>(to);
@@ -27,10 +32,9 @@ public class TransformationFixed implements Effect {
     @Override
     public boolean check(List<Resource> input, List<Resource> output, int pollution) {
         if (new HashSet<>(input).containsAll(from) && pollution == 0) {
-            output.addAll(to);
-            return true;
+            return new HashSet<>(to).containsAll(output);
         }
-        else return false;
+        return false;
     }
 
     @Override
@@ -38,11 +42,11 @@ public class TransformationFixed implements Effect {
         StringBuilder s = new StringBuilder();
         s.append("[(");
         for (Resource r : from) {
-            s.append(r).append(", ");
+            s.append(r).append(" ");
         }
         s.append(") -> (");
-        for (Resource r : to) {
-            s.append(s).append(", ");
+        for (Resource r: to) {
+            s.append(r).append(" ");
         }
         s.append(")]");
         return s.toString();

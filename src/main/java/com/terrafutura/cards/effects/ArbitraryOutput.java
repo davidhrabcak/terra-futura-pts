@@ -44,10 +44,9 @@ public class ArbitraryOutput implements Effect {
         StringBuilder s = new StringBuilder();
         s.append("[(");
         for (Resource r : from) {
-            s.append(r).append(", ");
+            s.append(r).append(" ");
         }
-        s.append(") -> (").append("any ").append(from).append(" resources)]");
-        s.append(")]");
+        s.append(") -> (").append("any ").append(to).append(" resources)]");
         return s.toString();
     }
 }
