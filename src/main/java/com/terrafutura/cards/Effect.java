@@ -5,13 +5,11 @@ import java.util.List;
 
 public interface Effect {
     /**
-     *  Checks input resources, if all required are present and there is no pollution,
-     *  removes them from input and adds correct resources to output, adds pollution
-     *  based on effect.
+     *  Checks input resources, if all required are present and there is no pollution.
      * @param input Input resources
      * @param output Puts all gained resources here
      * @param pollution Specifies if card with effect is polluted.
-     * @return If exchange was successful, returns true, else returns false.
+     * @return If exchange is valid, returns true, else returns false.
      */
     boolean check(List<Resource> input, List<Resource> output, int pollution);
 
