@@ -10,7 +10,7 @@ import main.java.com.terrafutura.resources.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-//TODO add state() calls so players know what is happening
+
 public class Game implements TerraFuturaInterface {
     private GameState state;
     public final List<Player> players;
@@ -99,11 +99,16 @@ public class Game implements TerraFuturaInterface {
     }
 
     @Override
-    public void selectReward(int playerId, Resource resource) { //unclear how do you get to this state :/
+    public void selectReward(int playerId, Resource resource) { // unclear how do you get to this state :/
         if (state != GameState.SelectReward || playerId != onTurn) {
             System.err.println("Action not possible");
         }
-        Player p = players.get(playerId);
+        // assumes selectReward was set somewhere...
+        if (selectReward.canSelectReward(resource)) {
+            selectReward.selectReward(resource);
+            System.out.println("Selecting " + resource + " from " + selectReward.state());
+        }
+
 
     }
 
@@ -112,7 +117,7 @@ public class Game implements TerraFuturaInterface {
         if (playerId >= players.size() || onTurn != playerId) return false;
         state = GameState.TakeCardNoCardDiscarded;
         onTurn = (onTurn + 1 >= players.size()) ? 0 : onTurn + 1;
-
+        System.out.println("Turn of Player " + playerId + " finished, Player " + onTurn + " is next.");
         players.get(playerId).g.endTurn();
         players.get(onTurn).g.beginTurn();
         return true;
@@ -123,8 +128,12 @@ public class Game implements TerraFuturaInterface {
         if (onTurn != playerId || state != GameState.SelectActivationPattern || card > 1 || card < 0) return false;
         Player p = players.get(playerId);
         if (card == 0 && !p.a2.isSelected()) {
+            System.out.println("Selecting Activation pattern " +  p.a1.state());
             p.a1.select();
-        } else p.a2.select();
+        } else {
+            p.a2.select();
+            System.out.println("Selecting Activation pattern " + p.a2.state());
+        }
         state = GameState.SelectScoringMethod;
         return true;
     }
@@ -133,8 +142,14 @@ public class Game implements TerraFuturaInterface {
     public boolean selectScoring(int playerId, int card) {
         if (onTurn != playerId || state != GameState.SelectScoringMethod || card > 1 || card < 0) return false;
         Player p = players.get(playerId);
-        if (card == 0) p.s1.selectThisMethodAndCalculate();
-        else p.s2.selectThisMethodAndCalculate();
+        if (card == 0) {
+            System.out.println("Selecting scoring method " +p.s1.state());
+            p.s1.selectThisMethodAndCalculate();
+        }
+        else {
+            System.out.println("Selecting scoring method " + p.s2.state());
+            p.s2.selectThisMethodAndCalculate();
+        }
         return true;
     }
 }
