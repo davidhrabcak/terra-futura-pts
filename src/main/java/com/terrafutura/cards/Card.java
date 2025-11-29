@@ -15,6 +15,11 @@ public class Card {
         this.pollutionSpaces = pollutionSpaces;
     }
 
+
+    public Card(int pollutionSpaces, Optional<Effect> effect, Optional<Effect> lowerEffect) {
+        // needs implementation
+    }
+
     public boolean canGetResources(List<Resource> resources) {
         return new HashSet<>(this.resources).containsAll(resources);
     }
