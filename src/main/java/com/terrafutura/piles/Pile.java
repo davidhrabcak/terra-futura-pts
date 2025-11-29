@@ -24,7 +24,7 @@ public class Pile {
 
     private void initializePile() {
         for (int i = 0; i < 3; i++) {
-            visibleCards.add(Optional.of(pile.removeLast()));
+            visibleCards.addFirst(Optional.of(pile.removeLast()));
         }
     }
 
@@ -41,7 +41,7 @@ public class Pile {
     public boolean removeLastCard() {
         if (!visibleCards.isEmpty() && !pile.isEmpty()) {
             visibleCards.removeLast();
-            visibleCards.add(Optional.of(pile.removeLast()));
+            visibleCards.addFirst(Optional.of(pile.removeLast()));
             return true;
         }
         return false;
