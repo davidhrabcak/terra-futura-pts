@@ -3,8 +3,7 @@ package main.java.com.terrafutura.game;
 import main.java.com.terrafutura.api.TerraFuturaInterface;
 import main.java.com.terrafutura.board.Grid;
 import main.java.com.terrafutura.board.GridPosition;
-import main.java.com.terrafutura.cards.Card;
-import main.java.com.terrafutura.cards.Pair;
+import main.java.com.terrafutura.cards.*;
 import main.java.com.terrafutura.piles.*;
 import main.java.com.terrafutura.resources.Resource;
 
@@ -16,7 +15,7 @@ public class Game implements TerraFuturaInterface {
     private GameState state;
     public final List<Player> players;
     private int onTurn, startingPlayer, turnNumber; // startingPlayer only used by GUI
-    private Card selectReward;
+    private SelectReward selectReward;
     private final Pile i, ii;
 
 
@@ -76,40 +75,33 @@ public class Game implements TerraFuturaInterface {
     }
 
     @Override
-    public boolean activateCard(int playerId, GridPosition card, List<Pair<List<Resource>, GridPosition>> inputs, List<Pair<List<Resource>, GridPosition>> outputs, List<GridPosition> pollution, Optional<Integer> otherPlayerId, Optional<GridPosition> otherCard) {
+    public boolean activateCard(int playerId, GridPosition card, List<Pair<Resource, GridPosition>> inputs, List<Pair<Resource, GridPosition>> outputs, List<GridPosition> pollution, Optional<Integer> otherPlayerId, Optional<GridPosition> otherCard) {
         if (state != GameState.ActivateCard || onTurn != playerId) return false;
         Player p = players.get(playerId);
         if (p.g.getCard(card).isEmpty() || p.g.canBeActivated(card)) return false;
-        p.g.setActivated(card);
 
-        for (int i = 0; i < inputs.size(); i++) {
-            Pair<List<Resource>, GridPosition> entryInput = inputs.get(i);
-            Pair<List<Resource>, GridPosition> entryOutput = outputs.get(i);
-            int entryPollution = (pollution.contains(entryInput.getSecond())) ? 1 : 0;
-            Optional<Card> cardOptional = p.g.getCard(entryInput.getSecond());
-            if (cardOptional.isEmpty()) continue;
-            if (cardOptional.get().check(entryInput.getFirst(), entryOutput.getFirst(), entryPollution)) {
-                if (cardOptional.get().checkLower(entryInput.getFirst(), entryOutput.getFirst(), entryPollution)) {
-                    state = GameState.SelectReward; // both effect possible - choose one
-                    return true;
-                }
-            } else continue; // invalid input or output for both effects
-            if (otherPlayerId.isEmpty() && cardOptional.get().hasAssistance()) {
-                if (otherCard.isEmpty()) return false;
-                // do stuff with otherCard - Assistance is not implemented in this project
-            }
+        boolean check;
+
+        if (otherPlayerId.isPresent() && otherCard.isPresent()
+                && p.g.getCard(otherCard.get()).isPresent()) {
+            ProcessActionAssistance paa = new ProcessActionAssistance();
+            check = paa.activateCard(p.g.getCard(card).get(), p.g, otherPlayerId.get(), p.g.getCard(otherCard.get()).get()
+                    ,inputs, outputs, pollution );
+        } else {
+            ProcessAction pa = new ProcessAction();
+            check = pa.activateCard(p.g.getCard(card).get(), p.g, inputs, outputs, pollution);
         }
-        selectReward = p.g.getCard(card).get();
+        if (!check) return false;
+
         if (turnNumber == 9) state = GameState.SelectActivationPattern;
         else turnFinished(playerId);
         return true;
     }
 
     @Override
-    public void selectReward(int playerId, Resource resource) { //TODO depends on implementation of Effect and Card
-
+    public void selectReward(int playerId, Resource resource) { //unclear how do you get to this state :/
         if (state != GameState.SelectReward || playerId != onTurn) {
-            throw new RuntimeException("Illegal turn action selectReward");
+            System.err.println("Action not possible");
         }
         Player p = players.get(playerId);
 
@@ -120,6 +112,9 @@ public class Game implements TerraFuturaInterface {
         if (playerId >= players.size() || onTurn != playerId) return false;
         state = GameState.TakeCardNoCardDiscarded;
         onTurn = (onTurn + 1 >= players.size()) ? 0 : onTurn + 1;
+
+        players.get(playerId).g.endTurn();
+        players.get(onTurn).g.beginTurn();
         return true;
     }
 
