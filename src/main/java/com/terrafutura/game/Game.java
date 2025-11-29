@@ -21,8 +21,8 @@ public class Game implements TerraFuturaInterface {
 
     public Game(int playerNumber, int startingPlayerIndex) {
         selectReward = null;
-        i = new Pile();
-        ii = new Pile();
+        i = new Pile(); // mock use - in real implementation, the actual cards
+        ii = new Pile();// would be stored in some data class
         if (playerNumber < 2 || playerNumber > 4) {
             throw new IllegalArgumentException("Game: Invalid number of players");
         }
