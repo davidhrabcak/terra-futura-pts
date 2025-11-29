@@ -4,7 +4,7 @@ import main.java.com.terrafutura.cards.Card;
 
 import java.util.*;
 
-public class Grid {
+public class Grid implements InterfaceActivateGrid{
     private final Map<GridPosition, Card> cards;
     private Set<GridPosition> activated;
     private List<GridPosition> activationPattern;
@@ -68,8 +68,12 @@ public class Grid {
             activated.add(coordinate);
         }
     }
-    public void setActivationPattern(List<GridPosition> patteren){
-        activationPattern = patteren;
+    @Override
+    public void setActivationPattern(Collection<AbstractMap.SimpleEntry<Integer, Integer>> pattern) {
+        activationPattern.clear();
+        for (AbstractMap.SimpleEntry<Integer, Integer> entry : pattern) {
+            activationPattern.add(new GridPosition(entry.getKey(), entry.getValue()));
+        }
     }
     public void endTurn(){
         activated.clear();
@@ -99,5 +103,4 @@ public class Grid {
         sb.append("]}");
         return sb.toString();
     }
-
 }
