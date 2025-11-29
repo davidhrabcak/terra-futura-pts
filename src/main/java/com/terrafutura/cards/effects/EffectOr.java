@@ -21,11 +21,17 @@ public class EffectOr implements Effect {
     @Override
     public boolean check(List<Resource> input, List<Resource> output, int pollution) {
         for (Effect e : children) {
-            List<Resource> result = new ArrayList<>();
-            if (e.check(input, result, pollution)) {
-                output.addAll(result);
+            if (e.check(input, output, pollution)) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasAssistance() {
+        for (Effect ch : children) {
+            if (ch.hasAssistance()) return true;
         }
         return false;
     }

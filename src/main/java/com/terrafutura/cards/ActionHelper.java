@@ -31,7 +31,7 @@ public class ActionHelper {
             if (!grid.canPutCard(position)) {
                 return false; // Invalid position
             }
-            Card card = grid.getCard(position);
+            Card card = grid.getCard(position).get();
             if (card == null || !card.canGetResources(List.of(resource))) {
                 return false; // Cannot get resources
             }
@@ -49,8 +49,9 @@ public class ActionHelper {
             if (!grid.canPutCard(position)) {
                 return false; // Invalid position
             }
-            Card card = grid.getCard(position);
-            if (card == null || !card.canPutResources(List.of(resource))) {
+            if (grid.getCard(position).isEmpty()) return false; // ak mergeujes a toto je konflikt,
+            Card card = grid.getCard(position).get();           // je to nepotrebne, fixuje tvoj bug aby som
+            if  (!card.canPutResources(List.of(resource))) {    // mohol spustat testy.
                 return false; // Cannot add resources
             }
         }
