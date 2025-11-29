@@ -8,6 +8,7 @@ public class Card {
 
     private final List<Resource> resources;
     private final int pollutionSpaces;
+    private int pollution = 0;
 
     public Card(List<Resource> resources, int pollutionSpaces) {
         this.resources = new ArrayList<>(resources);
@@ -28,6 +29,30 @@ public class Card {
     public List<Resource> getResources() {
         return resources;
     }
+
+    public void removeResource(Resource resource) {
+        resources.remove(resource);
+    }
+    public void addPollution(){
+        if(canAddPollution()) {
+            pollution++;
+        }else {
+            throw new IllegalStateException("Card has no pollution spaces left");
+        }
+    }
+    public void removePollution(){
+        pollution--;
+    }
+    public int getPollution(){
+        return pollution;
+    }
+    public boolean canAddPollution(){
+        return pollution < pollutionSpaces + 1 ;
+    }
+    public boolean isActive(){
+        return pollution <= pollutionSpaces;
+    }
+
 
     public boolean canPutResources(List<Resource> resources) {
         return true;
