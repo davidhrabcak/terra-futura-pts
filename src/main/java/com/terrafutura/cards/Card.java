@@ -8,8 +8,8 @@ public class Card {
 
     private final List<Resource> resources;
     private final int pollutionSpaces;
-    private Effect upperEffect;
-    private Effect lowerEffect;
+    private final Effect upperEffect;
+    private final Effect lowerEffect;
 
 
     public Card(int pollutionSpaces, Effect effect, Effect lowerEffect) {

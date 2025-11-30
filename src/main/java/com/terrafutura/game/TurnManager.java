@@ -1,7 +1,9 @@
 package main.java.com.terrafutura.game;
 
+import java.util.Arrays;
+
 public class TurnManager {
-    private int[] playersIds;
+    private final int[] playersIds;
     private int currentPlayerIndex = -1;
     private int turnNumber;
 
@@ -13,7 +15,7 @@ public class TurnManager {
             }
         }
         if (this.currentPlayerIndex == -1) {
-            throw new IllegalArgumentException("Player not found: " + playersIds);
+            throw new IllegalArgumentException("Player not found");
         }
         this.turnNumber = 1;
     }

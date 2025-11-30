@@ -10,7 +10,6 @@ import java.util.List;
  * Placeholder class for assistance card activation functionality
  * According to project requirements: "Simplified rules, no Assistance card effect"
  * This class exists to maintain interface consistency but ALWAYS rejects assistance activations
- *
  * ASSISTANCE FUNCTIONALITY IS INTENTIONALLY DISABLED in this simplified version of Terra Futura.
  * The full game rules include complex assistance mechanics where players can use other players'
  * card effects, but for this implementation we follow the simplified rules specification.

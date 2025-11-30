@@ -1,7 +1,6 @@
 package main.java.com.terrafutura.api;
 
 import main.java.com.terrafutura.board.GridPosition;
-import main.java.com.terrafutura.cards.Card;
 import main.java.com.terrafutura.cards.Pair;
 import main.java.com.terrafutura.piles.CardSource;
 import main.java.com.terrafutura.piles.Deck;

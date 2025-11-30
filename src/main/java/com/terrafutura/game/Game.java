@@ -163,7 +163,7 @@ public class Game implements TerraFuturaInterface {
     private void notifyObservers() {
         Map<Integer, String> states = new HashMap<>();
         for (int playerId : playerIDs) {
-            String playerState = "State: " + currentState + ", Player: " + playerId + ", On turn: " + (turnManager.isPlayerTurn(playerId));
+            String playerState = "State: " + currentState + ", Player: " + playerId;
             states.put(playerId, playerState);
         }
         observer.notifyAll(states);

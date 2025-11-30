@@ -1,6 +1,5 @@
 package main.java.com.terrafutura.cards;
 
-import main.java.com.terrafutura.board.Grid;
 import main.java.com.terrafutura.resources.Resource;
 
 import java.util.ArrayList;
