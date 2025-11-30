@@ -38,7 +38,7 @@ public class Game implements TerraFuturaInterface {
             map.put(i, new TerraFuturaObserverInterface() {
                 @Override
                 public void notify(String gameState) {
-                    // does something
+                    // does something useful to the player
                 }
             });
         }
