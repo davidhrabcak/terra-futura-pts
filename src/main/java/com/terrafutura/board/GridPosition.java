@@ -19,8 +19,4 @@ public class GridPosition {
     public int getY() {
         return y;
     }
-    
-    public int[] getCoordinates() {
-        return new int[]{x, y};
-    }
 }

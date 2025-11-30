@@ -49,11 +49,8 @@ public class Game implements TerraFuturaInterface {
             onTurn = startingPlayerIndex;
             startingPlayer = startingPlayerIndex;
             turnNumber = 1;
-            map.put(i, new TerraFuturaObserverInterface() {
-                @Override
-                public void notify(String gameState) {
-                    // does something useful to the player
-                }
+            map.put(i, gameState -> {
+                // does something useful to the player
             });
         }
         this.observers = new GameObserver(map);
@@ -75,7 +72,7 @@ public class Game implements TerraFuturaInterface {
             case I -> m.moveCard(i, destination, p.g);
             case II -> m.moveCard(ii, destination, p.g);
             case null, default -> { return false; }
-        };
+        }
         state = GameState.ActivateCard;
         return true;
     }
