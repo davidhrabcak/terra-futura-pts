@@ -19,8 +19,7 @@ public class SelectReward {
     }
 
     public boolean canSelectReward(Resource resource) {
-        return player.isPresent() &&
-                selection.contains(resource);
+        return player.isPresent() && selection.contains(resource);
     }
 
     public void selectReward(Resource resource) {
