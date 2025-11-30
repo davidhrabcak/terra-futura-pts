@@ -9,24 +9,23 @@ import main.java.com.terrafutura.piles.*;
 import main.java.com.terrafutura.resources.Resource;
 
 import java.util.*;
-// TODO change state transitions to specification
 public class Game implements TerraFuturaInterface {
     private GameState state;
     public final List<Player> players;
     private int onTurn, startingPlayer, turnNumber; // startingPlayer only used by GUI
-    private SelectReward selectReward;
+    private ProcessActionAssistance paa;
     private final Pile i, ii;
     private final GameObserver observers;
+    private final MoveCard m = new MoveCard(); // TODO najst pouzitie
 
 
     public Game(int playerNumber, int startingPlayerIndex, List<GameObserver> observers, long seed) {
-        selectReward = null;
         i = new Pile(seed); // mock use - in real implementation, the actual cards
         ii = new Pile(seed);// would be stored in some data class
         if (playerNumber < 2 || playerNumber > 4) {
             throw new IllegalArgumentException("Game: Invalid number of players");
         }
-
+        paa = new ProcessActionAssistance();
         state = null;
         this.players = new ArrayList<>();
         Map<Integer, TerraFuturaObserverInterface> map = new HashMap<>();
@@ -55,7 +54,7 @@ public class Game implements TerraFuturaInterface {
 
     @Override
     public boolean takeCard(int playerId, CardSource source, GridPosition destination) {
-        if (onTurn != playerId || state != GameState.TakeCardCardDiscarded && state != GameState.TakeCardNoCardDiscarded) return false;
+        if (onTurn != playerId || (state != GameState.TakeCardCardDiscarded && state != GameState.TakeCardNoCardDiscarded)) return false;
 
         Player p = players.get(playerId);
         Optional<Card> card;
@@ -93,9 +92,13 @@ public class Game implements TerraFuturaInterface {
 
         if (otherPlayerId.isPresent() && otherCard.isPresent()
                 && p.g.getCard(otherCard.get()).isPresent()) {
-            ProcessActionAssistance paa = new ProcessActionAssistance();
             check = paa.activateCard(p.g.getCard(card).get(), p.g, otherPlayerId.get(), p.g.getCard(otherCard.get()).get()
                     ,inputs, outputs, pollution );
+            if (check) {
+                state = GameState.SelectReward;
+                return true;
+            }
+            return false;
         } else {
             ProcessAction pa = new ProcessAction();
             check = pa.activateCard(p.g.getCard(card).get(), p.g, inputs, outputs, pollution);
@@ -108,28 +111,26 @@ public class Game implements TerraFuturaInterface {
     }
 
     @Override
-    public void selectReward(int playerId, Resource resource) { // unclear how do you get to this state :/
-        if (state != GameState.SelectReward || playerId != onTurn) {
-            System.err.println("Action not possible");
-        }
-        // assumes selectReward was set somewhere...
-        if (selectReward.canSelectReward(resource)) {
-            selectReward.selectReward(resource);
-            observers.notifyAll(Map.of(playerId, ("Selecting " + resource + " from " + selectReward.state())));
-        }
-
+    public void selectReward(int playerId, Resource resource) {
+        // calls some method in ProcessActionAssistance that validates and selects reward
+        // if (paa.canSelectReward(playerId, resource) && onTurn == playerId
+        //          && state == GameState.SelectReward) {
+        //      paa.getReward(playerId, resource);
+        // }
 
     }
 
     @Override
     public boolean turnFinished(int playerId) {
         if (playerId >= players.size() || onTurn != playerId) return false;
-        state = GameState.TakeCardNoCardDiscarded;
         onTurn = (onTurn + 1 >= players.size()) ? 0 : onTurn + 1;
         observers.notifyAll(Map.of(playerId, "Turn of Player " + playerId + " finished, Player " + onTurn + " is next."));
         players.get(playerId).g.endTurn();
         players.get(onTurn).g.beginTurn();
         if (onTurn == 0 && turnNumber != 0) turnNumber++;
+        if (turnNumber > 10) state = GameState.TakeCardNoCardDiscarded;
+        else if (turnNumber == 10) state = GameState.SelectActivationPattern;
+        else state = GameState.SelectScoringMethod;
         return true;
     }
 
@@ -144,7 +145,7 @@ public class Game implements TerraFuturaInterface {
             p.a2.select();
             observers.notifyAll(Map.of(playerId, "Selecting Activation pattern " + p.a2.state()));
         }
-        state = GameState.SelectScoringMethod;
+        state = GameState.ActivateCard;
         return true;
     }
 
@@ -160,6 +161,7 @@ public class Game implements TerraFuturaInterface {
             observers.notifyAll(Map.of(playerId, "Selecting scoring method " + p.s2.state()));
             p.s2.selectThisMethodAndCalculate();
         }
+        state = GameState.Finish;
         return true;
     }
 }
