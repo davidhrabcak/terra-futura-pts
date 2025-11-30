@@ -33,6 +33,7 @@ public class ProcessActionAssistance {
                                 List<Pair<Resource, GridPosition>> inputs,
                                 List<Pair<Resource, GridPosition>> outputs,
                                 List<GridPosition> pollution) {
+
         // In the full game, this would allow using another player's card effect,
         // but for this implementation we follow the simplified rules specification.
         return false;

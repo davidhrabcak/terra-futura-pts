@@ -12,7 +12,6 @@ import java.util.*;
  */
 public class ActionHelper {
 
-
     /**
      * Checks if any required parameters are null before proceeding with validation
      * @return true if any parameter is null, false if all parameters are valid objects

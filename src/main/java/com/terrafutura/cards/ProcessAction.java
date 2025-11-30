@@ -12,6 +12,7 @@ import java.util.Optional;
  * CHECKS if activation is possible and EXECUTES changes if valid
  */
 public class ProcessAction {
+
     private final ActionHelper helper = new ActionHelper();
 
     /**
