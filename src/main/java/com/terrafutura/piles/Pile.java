@@ -13,9 +13,16 @@ import java.util.Optional;
 public class Pile {
     private final List<Card> visibleCards;
     private final List<Card> hiddenCards;
+
+
+    /**
+     * Constructs a Pile from a list of cards
+     * First 4 cards become visible, in order: [oldest, ..., newest]
+     */
     public Pile(List<Card> cards){ //in beginning there should be 4 visible cards
-        visibleCards = new ArrayList<>(cards.subList(0, 4));
-        hiddenCards = new ArrayList<>(cards.subList(4, cards.size()));
+        int visible = Math.min(4, cards.size());
+        visibleCards = new ArrayList<>(cards.subList(0, visible));
+        hiddenCards = new ArrayList<>(cards.subList(visible, cards.size()));
     }
 
     /**
@@ -25,11 +32,11 @@ public class Pile {
      * @return Optional containing the card if the index is valid, empty otherwise
      */
     public Optional<Card> getCard(int index) {
-        if (index < 1 || index >= visibleCards.size()){
+        if (index < 1 || index > visibleCards.size()){
             return Optional.empty();
         }
-        return Optional.of(visibleCards.get(index - 1)); //indices are from 1 to 4
-
+        int actualIndex = visibleCards.size() - index;
+        return Optional.of(visibleCards.get(actualIndex));
     }
 
     /**
@@ -40,16 +47,21 @@ public class Pile {
      */
     public void takeCard(int index) {
         if (getCard(index).isPresent()) {
-            visibleCards.remove(index - 1); //indices are from 1 to 4
+            int actualIndex = visibleCards.size() - index;
+            visibleCards.remove(actualIndex);
             if(!hiddenCards.isEmpty()){
-                visibleCards.add(hiddenCards.removeFirst());
+                visibleCards.addLast(hiddenCards.removeFirst());
             }
+        }else {
+            throw new IllegalArgumentException("Card index out of bounds");
         }
     }
-
+    /**
+     * Removes the oldest card (index 4 in a pile, index 0 in a list) - discard action
+     */
     public void removeLastCard() {
         if(!visibleCards.isEmpty()){
-            takeCard(1); //this number will be lowered by one
+            takeCard(4);
         }
     }
     public String state() {
