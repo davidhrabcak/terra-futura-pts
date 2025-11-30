@@ -69,8 +69,8 @@ public class Game implements TerraFuturaInterface {
 
         Player p = players.get(playerId);
         switch (source.deck) {
-            case I -> m.moveCard(i, destination, p.g);
-            case II -> m.moveCard(ii, destination, p.g);
+            case I -> m.moveCard(i, destination, p.g); // when MoveCard is implemented correctly,
+            case II -> m.moveCard(ii, destination, p.g);//method call will include the card
             case null, default -> { return false; }
         }
         state = GameState.ActivateCard;
