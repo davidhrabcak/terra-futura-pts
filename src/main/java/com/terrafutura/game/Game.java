@@ -14,6 +14,7 @@ public class Game implements TerraFuturaInterface {
     public final List<Player> players;
     private int onTurn, startingPlayer, turnNumber; // startingPlayer only used by GUI
     private final ProcessActionAssistance paa; // used in activateCard and selectReward
+    private SelectRewardMemento selectRewardMemento;
     private final Pile i, ii;
     private final GameObserver observers;
     private final MoveCard m = new MoveCard(); // used in takeCard
@@ -88,11 +89,14 @@ public class Game implements TerraFuturaInterface {
         boolean check;
 
         if (otherPlayerId.isPresent() && otherCard.isPresent()
-                && p.g.getCard(otherCard.get()).isPresent()) {
-            check = paa.activateCard(p.g.getCard(card).get(), p.g, otherPlayerId.get(), p.g.getCard(otherCard.get()).get()
-                    ,inputs, outputs, pollution );
+                && players.get(otherPlayerId.get()).g.getCard(otherCard.get()).isPresent()) {
+            check = paa.activateCard(p.g.getCard(card).get(), p.g, otherPlayerId.get(),
+                    players.get(otherPlayerId.get()).g.getCard(otherCard.get()).get(),
+                    inputs, outputs, pollution );
             if (check) {
                 state = GameState.SelectReward;
+                List<Resource> some_reward = new ArrayList<>(); // we get this list somewhere in paa...
+                selectRewardMemento = new SelectRewardMemento(p.g.getCard(card).get(), players.get(otherPlayerId.get()).g.getCard(otherCard.get()).get(), playerId, otherPlayerId.get(),  some_reward);
                 return true;
             }
             return false;
@@ -109,11 +113,13 @@ public class Game implements TerraFuturaInterface {
 
     @Override
     public void selectReward(int playerId, Resource resource) {
-        // calls some method in ProcessActionAssistance that validates and selects reward
-        // if (paa.canSelectReward(playerId, resource) && onTurn == playerId
-        //          && state == GameState.SelectReward) {
-        //      paa.getReward(playerId, resource);
-        // }
+        SelectReward r = new SelectReward();
+        r.setReward(playerId, selectRewardMemento.card(), selectRewardMemento.reward());
+
+        if (r.canSelectReward(resource) && onTurn == playerId
+                 && state == GameState.SelectReward) {
+            r.selectReward(resource);
+        }
 
     }
 

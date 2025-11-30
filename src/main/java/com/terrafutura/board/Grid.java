@@ -23,7 +23,7 @@ public class Grid implements InterfaceActivateGrid{
     }
 
     public void putCard(GridPosition coordinate, Card card) {
-        if (onTurn) {
+        if (onTurn && canPutCard(coordinate)) {
             grid.putIfAbsent(coordinate, Optional.of(card));
         }
     }

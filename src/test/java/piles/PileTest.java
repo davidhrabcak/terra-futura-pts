@@ -9,8 +9,6 @@ import java.util.Optional;
 import static org.junit.Assert.*;
 import main.java.com.terrafutura.cards.effects.ArbitraryInOut;
 
-import javax.swing.text.html.Option;
-
 class CardFake extends Card {
     private final String name;
 
