@@ -119,7 +119,8 @@ public class Grid implements InterfaceActivateGrid{
             return false;
         }
         Card card = cardOpt.get();
-        if (!card.isActive()) {
+        //we cannot add anything, the card is blocked
+        if (!card.canPutResources(List.of())) {
             return false;
         }
         if(coordinate.getX() != lastAddedCardPosition.getX() && coordinate.getY() != lastAddedCardPosition.getY()){

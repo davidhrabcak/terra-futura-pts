@@ -15,7 +15,7 @@ public interface TerraFuturaInterface {
     boolean discardCard(int playerID, Deck deck);
     void activateCard(int playerID, GridPosition card,
                       List<Pair<Resource, GridPosition>> inputs, List<Pair<Resource, GridPosition>> outputs,
-                      List<GridPosition> pollution, Optional<Integer> otherPlayerId, Resource resource);
+                      List<GridPosition> pollution, Optional<Integer> otherPlayerId, Optional<GridPosition> otherCard);
     void selectReward(int playerID, Resource resource);
     boolean turnFinished(int playerID);
     boolean selectActivationPattern(int playerID, int card);

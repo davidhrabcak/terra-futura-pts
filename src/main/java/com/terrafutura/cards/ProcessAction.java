@@ -48,7 +48,8 @@ public class ProcessAction {
                                        List<GridPosition> pollution) {
 
         // Card must be active (not blocked by pollution)
-        if (!card.isActive()){
+        //if we can't add anything, we the cards is blocked
+        if (!card.canPutResources(List.of())){
             return false;
         }
 

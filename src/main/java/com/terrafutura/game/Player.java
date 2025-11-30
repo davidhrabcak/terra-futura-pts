@@ -19,4 +19,10 @@ public class Player {
         this.a2 = a2;
         this.g = g;
     }
+    public int getID(){return id;}
+    public ScoringMethod getScoreMethod1(){return s1;}
+    public ScoringMethod getScoreMethod2(){return s2;}
+    public ActivationPattern getActivationPattern1(){return a1;}
+    public ActivationPattern getActivationPattern2(){return a2;}
+    public Grid getGrid(){return g;}
 }

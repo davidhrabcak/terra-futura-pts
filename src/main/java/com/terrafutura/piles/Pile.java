@@ -28,29 +28,41 @@ public class Pile {
     /**
      * Retrieves a card from visible cards by index (1-based indexing)
      *
-     * @param index Position of card (1 = newest, 4 = oldest)
+     * @param index Position of card (0 = card from hidden cards, 1 = newest, 4 = oldest)
      * @return Optional containing the card if the index is valid, empty otherwise
      */
     public Optional<Card> getCard(int index) {
-        if (index < 1 || index > visibleCards.size()){
+        if (index == 0 && !hiddenCards.isEmpty()) {
+            return Optional.of(hiddenCards.removeFirst());
+        }
+
+        if (index < 1 || index > visibleCards.size()) {
             return Optional.empty();
         }
+
         int actualIndex = visibleCards.size() - index;
         return Optional.of(visibleCards.get(actualIndex));
+
     }
 
     /**
      * Removes a card from visible cards and replenishes from hidden cards if available
-     * Follows game rules: taken card is replaced with top card from hidden deck
+     * or takes card from top of hidden deck if possible.
+     * Follows game rules: taken card is replaced with the top card from the hidden deck
      *
      * @param index Position of card to remove (1-based indexing)
      */
     public void takeCard(int index) {
         if (getCard(index).isPresent()) {
-            int actualIndex = visibleCards.size() - index;
-            visibleCards.remove(actualIndex);
-            if(!hiddenCards.isEmpty()){
-                visibleCards.addLast(hiddenCards.removeFirst());
+            if (index == 0) {
+                hiddenCards.removeFirst();
+            }
+            else{
+                int actualIndex = visibleCards.size() - index;
+                visibleCards.remove(actualIndex);
+                if (!hiddenCards.isEmpty()) {
+                    visibleCards.addLast(hiddenCards.removeFirst());
+                }
             }
         }else {
             throw new IllegalArgumentException("Card index out of bounds");

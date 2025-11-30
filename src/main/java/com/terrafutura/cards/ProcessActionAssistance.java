@@ -60,7 +60,9 @@ public class ProcessActionAssistance {
             return false;
         }
 
-        if (!assistingCard.isActive()) {
+        // Card must be active (not blocked by pollution)
+        //if we can't add anything, we the cards is blocked
+        if (!assistingCard.canPutResources(List.of())){
             return false;
         }
 

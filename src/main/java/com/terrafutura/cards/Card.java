@@ -44,14 +44,6 @@ public class Card {
         resources.remove(resource);
     }
 
-    public boolean isActive() {
-        return getPollutionCount() <= pollutionSpaces;
-    }
-
-    private int getPollutionCount() {
-        return (int) resources.stream().filter(r -> r == Resource.Pollution).count();
-    }
-
 
     public boolean canPutResources(List<Resource> toAdd) {
         // count pollution in the resources we want to add
@@ -63,6 +55,10 @@ public class Card {
 
         // count current pollution
         int currentPollution = (int)resources.stream().filter(r -> r == Resource.Pollution).count();
+
+        if (currentPollution > pollutionSpaces) {
+            return false;
+        }
 
         // we can only add pollutionSpaces + 1 pollution
         return currentPollution + newPollution <= pollutionSpaces + 1;
