@@ -13,10 +13,10 @@ public class Game implements TerraFuturaInterface {
     private GameState state;
     public final List<Player> players;
     private int onTurn, startingPlayer, turnNumber; // startingPlayer only used by GUI
-    private ProcessActionAssistance paa;
+    private final ProcessActionAssistance paa; // used in activateCard and selectReward
     private final Pile i, ii;
     private final GameObserver observers;
-    private final MoveCard m = new MoveCard(); // TODO najst pouzitie
+    private final MoveCard m = new MoveCard(); // used in takeCard
 
 
     public Game(int playerNumber, int startingPlayerIndex, List<GameObserver> observers, long seed) {
@@ -57,14 +57,11 @@ public class Game implements TerraFuturaInterface {
         if (onTurn != playerId || (state != GameState.TakeCardCardDiscarded && state != GameState.TakeCardNoCardDiscarded)) return false;
 
         Player p = players.get(playerId);
-        Optional<Card> card;
         switch (source.deck) {
-            case I -> card = i.takeCard(source.index);
-            case II -> card = ii.takeCard(source.index);
+            case I -> m.moveCard(i, destination, p.g);
+            case II -> m.moveCard(ii, destination, p.g);
             case null, default -> { return false; }
         };
-        if (!p.g.canPutCard(destination) || card.isEmpty()) return false;
-        p.g.putCard(destination, card.get());
         state = GameState.ActivateCard;
         return true;
     }
