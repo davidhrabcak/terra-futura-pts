@@ -5,8 +5,6 @@ import main.java.com.terrafutura.board.ActivationPattern;
 import main.java.com.terrafutura.board.Grid;
 import main.java.com.terrafutura.board.GridPosition;
 import main.java.com.terrafutura.cards.*;
-import main.java.com.terrafutura.cards.effects.ArbitraryBasic;
-import main.java.com.terrafutura.cards.effects.EffectOr;
 import main.java.com.terrafutura.piles.CardSource;
 import main.java.com.terrafutura.piles.Deck;
 import main.java.com.terrafutura.piles.Pile;
@@ -26,6 +24,8 @@ public class Game implements TerraFuturaInterface {
     private Pile pile1;
     private Pile pile2;
     private CardFactory cardFactory;
+    private SelectReward selectReward;
+    private ProcessActionAssistance processActionAssistance;
 
     public Game(int playerCount, int startingPlayerID){
         if (playerCount < 2 || playerCount > 4){
@@ -157,6 +157,11 @@ public class Game implements TerraFuturaInterface {
         Player player = players.get(playerID);
         Grid grid = player.getGrid();
 
+        if (!hasMoreCardsToActivate(grid)) {
+            currentState = GameState.TakeCardNoCardDiscarded;
+            return;
+        }
+
         if (!grid.canBeActivated(card)){
             return;
         }
@@ -179,11 +184,12 @@ public class Game implements TerraFuturaInterface {
             }
             Card assistingCard = assistingCardOpt.get();
 
-            ProcessActionAssistance processActionAssistance = new ProcessActionAssistance();
+            this.processActionAssistance = new ProcessActionAssistance();
             success = processActionAssistance.activateCard(cardToActivate, grid, assistingPlayer, assistingCard, inputs, outputs, pollution);
 
             if (success) {
                 // State transition for Assistance - the player who owns the copied card selects a reward
+                selectReward = processActionAssistance.getSelectReward();
                 currentState = GameState.SelectReward;
             }
         }else {
@@ -225,15 +231,24 @@ public class Game implements TerraFuturaInterface {
 
     @Override
     public void selectReward(int playerID, Resource resource) {
-        if (currentState != GameState.SelectReward){
+        if (currentState != GameState.SelectReward || selectReward == null){
             return;
         }
-
-
+        if(!selectReward.canSelectReward(resource)){
+            return;
+        }
+        selectReward.selectReward(resource);
+        processActionAssistance = null;
+        selectReward = null;
+        currentState = GameState.ActivateCard;
     }
 
     @Override
     public boolean turnFinished(int playerID) {
+        if(!turnManager.isPlayerTurn(playerID)){
+            return false;
+        }
+
         return false;
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class ProcessActionAssistance {
     private final ActionHelper helper = new ActionHelper();
-    private final SelectReward selectReward = new SelectReward();
+    private SelectReward selectReward;
 
     /**
      * Validates and executes assistance activation including reward selection
@@ -115,6 +115,7 @@ public class ProcessActionAssistance {
         // PHASE 2: Setup reward selection for assisting player
         // (The actual reward selection happens later via selectReward.selectReward())
         List<Resource> paidResources = helper.extractResources(inputs);
+        this.selectReward = new SelectReward();
         selectReward.setReward(assistingPlayer, card, paidResources.toArray(new Resource[0]));
 
         // PHASE 3: Add output resources to target cards (result of transformation)
@@ -127,5 +128,8 @@ public class ProcessActionAssistance {
         for (GridPosition pollutionPos : pollution) {
             grid.getCard(pollutionPos).ifPresent(targetCard -> targetCard.putResources(List.of(Resource.Pollution)));
         }
+    }
+    public SelectReward getSelectReward() {
+        return selectReward;
     }
 }

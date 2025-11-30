@@ -1,5 +1,6 @@
 package main.java.com.terrafutura.cards;
 
+import main.java.com.terrafutura.board.Grid;
 import main.java.com.terrafutura.resources.Resource;
 
 import java.util.ArrayList;
@@ -10,11 +11,11 @@ import java.util.Optional;
 public class SelectReward {
     private Optional<Integer> player = Optional.empty();
     private List<Resource> selection = new ArrayList<>();
-    private Optional<Card> rewardCard = Optional.empty();
+    private Card rewardCard;
 
     public void setReward(int player, Card card, Resource[] reward) {
         this.player = Optional.of(player);
-        this.rewardCard = Optional.of(card);
+        this.rewardCard = card;
         this.selection = Arrays.asList(reward);
     }
 
@@ -26,14 +27,13 @@ public class SelectReward {
         if (!canSelectReward(resource)) {
             throw new IllegalStateException("Cannot select this reward");
         }
-        //???
-
+        rewardCard.putResources(List.of(resource));
         reset();
     }
 
     private void reset() {
         this.player = Optional.empty();
-        this.rewardCard = Optional.empty();
+        this.rewardCard = null;
         this.selection.clear();
     }
 
@@ -46,15 +46,13 @@ public class SelectReward {
             sb.append("null");
         }
 
-        // Card
         sb.append(", card: ");
-        if (rewardCard.isPresent()) {
-            sb.append(rewardCard.get().getClass().getSimpleName());
+        if (rewardCard != null) {
+            sb.append(rewardCard);
         } else {
             sb.append("null");
         }
 
-        // Selection
         sb.append(", selection: [");
         for (int i = 0; i < selection.size(); i++) {
             if (i > 0) {
