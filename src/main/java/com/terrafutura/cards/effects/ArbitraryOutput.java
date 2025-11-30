@@ -27,8 +27,8 @@ public class ArbitraryOutput implements Effect {
     /**
      *
      * @param input Input resources
-     * @param desiredOutput caller specifies which resources they need
-     * @param pollution if card is polluted, pollution is non-zero
+     * @param desiredOutput the caller specifies which resources they need
+     * @param pollution if the card is polluted, pollution is non-zero
      * @return If the right input and correct output size is provided, return true.
      */
     @Override

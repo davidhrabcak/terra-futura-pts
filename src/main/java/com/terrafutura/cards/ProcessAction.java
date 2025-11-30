@@ -74,8 +74,8 @@ public class ProcessAction {
 
         // Validate the transaction against card's effect rules
         // Try upper effect first, then lower effect if upper fails
-        if (!helper.validTransaction(card, inputs, outputs, pollution, true)) { //try upper
-            if (!helper.validTransaction(card, inputs, outputs, pollution, false)){ // try lower
+        if (!helper.validTransaction(card, inputs, outputs, true)) { //try upper
+            if (!helper.validTransaction(card, inputs, outputs, false)){ // try lower
                 return false; // Both effects rejected the transaction
             }
         }
@@ -100,13 +100,13 @@ public class ProcessAction {
         // Add output resources to target cards
         for (Pair<Resource, GridPosition> output : outputs) {
             Optional<Card> cardOpt = grid.getCard(output.getSecond());
-            cardOpt.ifPresent(sourceCard -> sourceCard.putResources(List.of(output.getFirst())));
+            cardOpt.ifPresent(targetCard -> targetCard.putResources(List.of(output.getFirst())));
         }
 
         // Add pollution tokens
         for (GridPosition pollutionPos : pollution) {
             Optional<Card> cardOpt = grid.getCard(pollutionPos);
-            cardOpt.ifPresent(Card::addPollution);
+            cardOpt.ifPresent(targetCard -> targetCard.putResources(List.of(Resource.Pollution)));
         }
     }
 }

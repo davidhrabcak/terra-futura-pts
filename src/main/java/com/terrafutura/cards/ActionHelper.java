@@ -4,9 +4,7 @@ import main.java.com.terrafutura.board.Grid;
 import main.java.com.terrafutura.board.GridPosition;
 import main.java.com.terrafutura.resources.Resource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Helper class containing common validation logic for ProcessAction and ProcessActionAssistance
@@ -80,16 +78,37 @@ public class ActionHelper {
      * @return false if the position is invalid, has no card, or card cannot accept more pollution
      */
     public boolean validatePollution(List<GridPosition> pollution, Grid grid) {
+        // Group pollution by card where it should go
+        Map<Card, Integer> pollutionPerCard = new HashMap<>();
+
         for (GridPosition position : pollution) {
-            // Check if the position is valid and contains a card (canPutCard=true means empty position)
-            if (invalidPosition(position) || grid.canPutCard(position)){
-                return false; // Invalid position or no card exists at position
+            if (invalidPosition(position) || grid.canPutCard(position)) {
+                return false;
             }
             Optional<Card> cardOpt = grid.getCard(position);
-            if (cardOpt.isEmpty() || !cardOpt.get().canAddPollution()) {
-                return false; // Card doesn't exist or cannot accept more pollution
+            if (cardOpt.isEmpty()) {
+                return false;
+            }
+            Card card = cardOpt.get();
+
+            // count how much pollution should go to each card
+            pollutionPerCard.put(card, pollutionPerCard.getOrDefault(card, 0) + 1);
+        }
+
+        // check if each card can accept the pollution
+        for (Map.Entry<Card, Integer> entry : pollutionPerCard.entrySet()) {
+            Card card = entry.getKey();
+            int pollutionCount = entry.getValue();
+
+            // list of pollution tokens to add
+            List<Resource> pollutionToAdd = Collections.nCopies(pollutionCount, Resource.Pollution);
+
+            // chceck if the card can accept all the pollution meant to go to it
+            if (!card.canPutResources(pollutionToAdd)) {
+                return false;
             }
         }
+
         return true;
     }
 
@@ -101,13 +120,14 @@ public class ActionHelper {
      * @return true if the card's effect approves the proposed resource transformation
      */
     public boolean validTransaction(Card card, List<Pair<Resource, GridPosition>> inputs,
-                                    List<Pair<Resource, GridPosition>> outputs, List<GridPosition> pollution, boolean upper) {
+                                    List<Pair<Resource, GridPosition>> outputs, boolean upper) {
+        int currentPollution = (int)card.getResources().stream().filter(r -> r == Resource.Pollution).count();
         List<Resource> inputResources = extractResources(inputs);
         List<Resource> outputResources = extractResources(outputs);
         if (upper) {
-            return card.check(inputResources, outputResources, pollution.size());
+            return card.check(inputResources, outputResources, currentPollution);
         }else {
-            return card.checkLower(inputResources, outputResources, pollution.size());
+            return card.checkLower(inputResources, outputResources, currentPollution);
         }
     }
 

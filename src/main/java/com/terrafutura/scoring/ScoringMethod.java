@@ -15,7 +15,6 @@ public class ScoringMethod {
     }
 
     public void selectThisMethodAndCalculate() {
-
     }
 
     public String state() {
