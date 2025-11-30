@@ -1,7 +1,5 @@
 package main.java.com.terrafutura.game;
 
-import java.util.Arrays;
-
 public class TurnManager {
     private final int[] playersIds;
     private int currentPlayerIndex = -1;
