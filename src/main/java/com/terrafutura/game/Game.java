@@ -12,6 +12,19 @@ import java.util.*;
 public class Game implements TerraFuturaInterface {
     private GameState state;
     public final List<Player> players;
+
+    public int getOnTurn() { // used in gameObservers
+        return onTurn;
+    }
+
+    public int getStartingPlayer() { // used in gameObservers
+        return startingPlayer;
+    }
+
+    public int getTurnNumber() { // used in gameObservers
+        return turnNumber;
+    }
+
     private int onTurn, startingPlayer, turnNumber; // startingPlayer only used by GUI
     private final ProcessActionAssistance paa; // used in activateCard and selectReward
     private SelectRewardMemento selectRewardMemento;

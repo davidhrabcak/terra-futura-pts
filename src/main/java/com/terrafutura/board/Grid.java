@@ -1,8 +1,6 @@
 package main.java.com.terrafutura.board;
 
 import main.java.com.terrafutura.cards.Card;
-import main.java.com.terrafutura.cards.MoveCard;
-import main.java.com.terrafutura.resources.Resource;
 
 import java.util.*;
 
@@ -20,6 +18,10 @@ public class Grid implements InterfaceActivateGrid{
 
     public void beginTurn() {
         onTurn = true;
+    }
+
+    public ActivationPattern getActivationPattern() {
+        return activationPattern;
     }
 
     public void putCard(GridPosition coordinate, Card card) {
@@ -62,6 +64,7 @@ public class Grid implements InterfaceActivateGrid{
     @Override
     public void setActivationPattern(Collection<AbstractMap.SimpleEntry<Integer, Integer>> pattern) {
         activationPattern = new ActivationPattern(this, pattern);
+        activationPattern.select();
     }
 
     public void endTurn() {
