@@ -1,4 +1,4 @@
-package test.java;
+package test.java.cards;
 
 import main.java.com.terrafutura.cards.SelectReward;
 import main.java.com.terrafutura.cards.Card;
