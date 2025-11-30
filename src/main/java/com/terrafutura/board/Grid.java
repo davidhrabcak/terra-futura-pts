@@ -46,7 +46,7 @@ public class Grid implements InterfaceActivateGrid{
      * @return true if the card can be placed, false otherwise
      */
     public boolean canPutCard(GridPosition coordinate){
-        // Check if position is within the 5x5 grid boundaries
+        // Check if the position is within the 5x5 grid boundaries
         if(coordinate.getX() < - 2 || coordinate.getX() > 2 || coordinate.getY() < -2 || coordinate.getY() > 2){
             return false;
         }
@@ -71,7 +71,7 @@ public class Grid implements InterfaceActivateGrid{
         if (cardsInRow >= 3 || cardsInColumn >= 3) {
             return false;
         }
-        // Check if the resulting grid would still fit in a 3x3 bounding box
+        // Check if the resulting grid would still fit in a 3x3
         if (!cards.isEmpty()){
             int minX = coordinate.getX();
             int maxX = coordinate.getX();

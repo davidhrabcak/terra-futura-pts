@@ -11,17 +11,12 @@ public class Card {
     private Effect upperEffect;
     private Effect lowerEffect;
 
-    public Card(int pollutionSpaces, Effect upperEffect, Effect lowerEffect) {
+
+    public Card(int pollutionSpaces, Effect effect, Effect lowerEffect) {
         this.resources = new ArrayList<>();
         this.pollutionSpaces = pollutionSpaces;
-        this.upperEffect = upperEffect;
+        this.upperEffect = effect;
         this.lowerEffect = lowerEffect;
-    }
-
-
-    public Card(int pollutionSpaces, Optional<Effect> effect, Optional<Effect> lowerEffect) {
-        resources = new ArrayList<>();
-        this.pollutionSpaces = pollutionSpaces;
     }
 
     public boolean canGetResources(List<Resource> requested) {
@@ -72,7 +67,10 @@ public class Card {
     }
 
     public boolean check(List<Resource> input, List<Resource> output, int pollution) {
-        return upperEffect.check(input, output, pollution);
+        if (upperEffect != null) {
+            return upperEffect.check(input, output, pollution);
+        }
+        return false;
     }
 
     public boolean checkLower(List<Resource> input, List<Resource> output, int pollution) {

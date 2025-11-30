@@ -39,6 +39,7 @@ public class Game implements TerraFuturaInterface {
     /**
      * Constructs a new Terra Futura game with specified number of players and starting player.
      * Initializes all game components including players, grids, card piles, and observers.
+     * Activation patterns are created at the end of the game based on actual card positions.
      *
      * @param playerCount the number of players (must be between 2 and 4)
      * @param startingPlayerID the ID of the player who starts the game
@@ -75,20 +76,63 @@ public class Game implements TerraFuturaInterface {
             //In complete implementation it would be effect with hasAssistance == True;
             Card startingCard = cardFactory.createStartingCard();
             Grid g = new Grid(startingCard);
-            Player p = new Player(playerID, randomScoringMethod(), randomScoringMethod(), randomActivationPattern(g), randomActivationPattern(g), g);
+            Player p = new Player(playerID, randomScoringMethod(), randomScoringMethod(), null, null, g);
             players.put(playerID, p);
         }
 
     }
 
     /**
-     * Generates a random activation pattern for a player's grid.
-     * @param grid the player's grid for which to generate the pattern
-     * @return a random ActivationPattern
+     * Gets all card positions in the grid by scanning all possible positions.
+     * @param grid the grid to scan for card positions
+     * @return a collection of SimpleEntry objects representing the (x,y) coordinates
+     *         of all positions that contain cards
      */
-    private ActivationPattern randomActivationPattern(Grid grid){
-        Collection<AbstractMap.SimpleEntry<Integer,Integer>> position = List.of(new AbstractMap.SimpleEntry<>(rnd.nextInt(5) - 2, rnd.nextInt(5) - 2));
-        return new ActivationPattern(grid, position);
+    private Collection<AbstractMap.SimpleEntry<Integer, Integer>> getAllCardPositions(Grid grid) {
+        Collection<AbstractMap.SimpleEntry<Integer, Integer>> positions = new ArrayList<>();
+        for (int x = -2; x <= 2; x++) {
+            for (int y = -2; y <= 2; y++) {
+                GridPosition pos = new GridPosition(x, y);
+                if (grid.getCard(pos).isPresent()) {
+                    positions.add(new AbstractMap.SimpleEntry<>(x, y));
+                }
+            }
+        }
+        return positions;
+    }
+
+    /**
+     * Creates two random activation patterns by selecting 4 random card positions for each pattern.
+     * This method is called at the end of the game when the grid is complete with exactly 9 cards.
+     * It generates two distinct activation patterns by randomly shuffling the card positions
+     * and selecting the first 4 positions for each pattern.
+     * @param grid the player's grid containing all placed cards
+     * @return a list containing two ActivationPattern objects with randomly selected positions
+     * @throws IllegalStateException if the grid does not contain exactly 9 cards,
+     * indicating an invalid game state at the end phase
+     */
+    private List<ActivationPattern> createRandomActivationPatterns(Grid grid) {
+        Collection<AbstractMap.SimpleEntry<Integer, Integer>> allPositions = getAllCardPositions(grid);
+
+        if (allPositions.size() != 9) {
+            throw new IllegalStateException("Grid should have exactly 9 cards at the end of the game");
+        }
+
+        // Convert to List for shuffling
+        List<AbstractMap.SimpleEntry<Integer, Integer>> positionList = new ArrayList<>(allPositions);
+
+        // Create first pattern - shuffle and take first 4 positions
+        Collections.shuffle(positionList);
+        Collection<AbstractMap.SimpleEntry<Integer, Integer>> pattern1 = new ArrayList<>(positionList.subList(0, 4));
+
+        // Create second pattern - shuffle again and take first 4 positions
+        Collections.shuffle(positionList);
+        Collection<AbstractMap.SimpleEntry<Integer, Integer>> pattern2 = new ArrayList<>(positionList.subList(0, 4));
+
+        return Arrays.asList(
+                new ActivationPattern(grid, pattern1),
+                new ActivationPattern(grid, pattern2)
+        );
     }
 
     /**
@@ -128,7 +172,6 @@ public class Game implements TerraFuturaInterface {
     /**
      * Allows the current player to take a card from the specified source and place it on their grid.
      * Transitions game state to ActivateCard if successful.
-     *
      * @param playerID the ID of the player taking the card
      * @param cardSource the source of the card (deck and index)
      * @param destination the grid position where to place the card
@@ -177,7 +220,6 @@ public class Game implements TerraFuturaInterface {
     /**
      * Allows the current player to discard the last card from the specified deck.
      * Transition game state to TakeCardCardDiscarded if successful.
-     *
      * @param playerID the ID of the player discarding the card
      * @param deck the deck from which to discard the last card
      * @return true if the card was successfully discarded, false otherwise
@@ -207,7 +249,6 @@ public class Game implements TerraFuturaInterface {
      * Handles both regular card activation and Assistance card effects.
      * For Assistance cards, transitions to SelectReward state for the assisting player.
      * (NOTE: Assistance functionality is not fully implemented according to assignment requirements)
-     *
      * @param playerID the ID of the player activating the card
      * @param card the grid position of the card to activate
      * @param inputs list of resource-position pairs used as input for the card effect
@@ -270,10 +311,9 @@ public class Game implements TerraFuturaInterface {
 
     /**
      * Allows a player to select a reward after an Assistance card effect.
-     * Transitions game state back to ActivateCard after reward selection.
-     *
+     * Transition game state back to ActivateCard after reward selection.
      * @param playerID the ID of the player selecting the reward
-     * @param resource the resource selected as reward
+     * @param resource the resource selected as a reward
      */
     @Override
     public void selectReward(int playerID, Resource resource) {
@@ -293,7 +333,6 @@ public class Game implements TerraFuturaInterface {
     /**
      * Ends the current player's turn and advances to the next player.
      * Checks if the game should end (after 9 turns) and transitions to appropriate state.
-     *
      * @param playerID the ID of the player ending their turn
      * @return true if the turn was successfully ended, false otherwise
      */
@@ -311,6 +350,11 @@ public class Game implements TerraFuturaInterface {
         turnManager.nextTurn();
 
         if (turnManager.getTurnNumber() == 9){
+            for (Player p : players.values()) {
+                List<ActivationPattern> patterns = createRandomActivationPatterns(p.getGrid());
+                p.setActivationPattern1(patterns.get(0));
+                p.setActivationPattern2(patterns.get(1));
+            }
             currentState = GameState.SelectActivationPattern;
             notifyObservers();
         }else {
@@ -324,7 +368,6 @@ public class Game implements TerraFuturaInterface {
     /**
      * Allows a player to select an activation pattern for the final activation phase.
      * When all players have selected a pattern, transitions to ActivateCard state.
-     *
      * @param playerID the ID of the player selecting the pattern
      * @param card which pattern to select (1 or 2)
      * @return true if the pattern was successfully selected, false otherwise
@@ -364,7 +407,6 @@ public class Game implements TerraFuturaInterface {
      * Allows a player to select a scoring method for final scoring.
      * Immediately transitions game to Finish state after selection.
      * Note: Unlike activation patterns, scoring method selection is individual and doesn't wait for other players.
-     *
      * @param playerID the ID of the player selecting the scoring method
      * @param card which scoring method to select (1 or 2)
      * @return true if the scoring method was successfully selected, false otherwise

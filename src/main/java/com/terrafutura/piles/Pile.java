@@ -27,13 +27,12 @@ public class Pile {
 
     /**
      * Retrieves a card from visible cards by index (1-based indexing)
-     *
      * @param index Position of card (0 = card from hidden cards, 1 = newest, 4 = oldest)
      * @return Optional containing the card if the index is valid, empty otherwise
      */
     public Optional<Card> getCard(int index) {
         if (index == 0 && !hiddenCards.isEmpty()) {
-            return Optional.of(hiddenCards.removeFirst());
+            return Optional.of(hiddenCards.getFirst());
         }
 
         if (index < 1 || index > visibleCards.size()) {
@@ -48,24 +47,25 @@ public class Pile {
     /**
      * Removes a card from visible cards and replenishes from hidden cards if available
      * or takes card from top of hidden deck if possible.
-     * Follows game rules: taken card is replaced with the top card from the hidden deck
-     *
      * @param index Position of card to remove (1-based indexing)
      */
     public void takeCard(int index) {
-        if (getCard(index).isPresent()) {
-            if (index == 0) {
-                hiddenCards.removeFirst();
+        if (index == 0) {
+            if (hiddenCards.isEmpty()) {
+                throw new IllegalArgumentException("No cards in hidden deck");
             }
-            else{
-                int actualIndex = visibleCards.size() - index;
-                visibleCards.remove(actualIndex);
-                if (!hiddenCards.isEmpty()) {
-                    visibleCards.addLast(hiddenCards.removeFirst());
-                }
+            hiddenCards.removeFirst();
+        } else {
+            if (index < 1 || index > visibleCards.size()) {
+                throw new IllegalArgumentException("Invalid card index: " + index);
             }
-        }else {
-            throw new IllegalArgumentException("Card index out of bounds");
+
+            int actualIndex = visibleCards.size() - index;
+            visibleCards.remove(actualIndex);
+
+            if (!hiddenCards.isEmpty()) {
+                visibleCards.add(hiddenCards.removeFirst());
+            }
         }
     }
     /**

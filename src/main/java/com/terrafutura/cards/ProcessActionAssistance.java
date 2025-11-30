@@ -7,10 +7,13 @@ import main.java.com.terrafutura.resources.Resource;
 import java.util.List;
 
 /**
- * Class for VALIDATING card activation with assistance effect
- * Simplified implementation - assistance effects always return false per project requirements
- * "Simplified rules, no Assistance card effect"
- * This class exists to maintain interface consistency but always rejects assistance activations
+ * Placeholder class for assistance card activation functionality
+ * According to project requirements: "Simplified rules, no Assistance card effect"
+ * This class exists to maintain interface consistency but ALWAYS rejects assistance activations
+ *
+ * ASSISTANCE FUNCTIONALITY IS INTENTIONALLY DISABLED in this simplified version of Terra Futura.
+ * The full game rules include complex assistance mechanics where players can use other players'
+ * card effects, but for this implementation we follow the simplified rules specification.
  */
 public class ProcessActionAssistance {
     private final ActionHelper helper = new ActionHelper();
@@ -31,15 +34,18 @@ public class ProcessActionAssistance {
                                 List<Pair<Resource, GridPosition>> inputs,
                                 List<Pair<Resource, GridPosition>> outputs,
                                 List<GridPosition> pollution) {
+        // In the full game, this would allow using another player's card effect,
+        // but for this implementation we follow the simplified rules specification.
+        return false;
 
-        // 1. VALIDATION PHASE - check if assistance activation is possible
-        if (!validateAssistanceActivation(card, grid, assistingPlayer, assistingCard, inputs, outputs, pollution)) {
-            return false;
-        }
-
-        // 2. EXECUTION PHASE - perform the complete assistance transaction
-        executeAssistanceTransaction(card, grid, assistingPlayer, assistingCard, inputs, outputs, pollution);
-        return true;
+//        // 1. VALIDATION PHASE - check if assistance activation is possible
+//        if (!validateAssistanceActivation(card, grid, assistingPlayer, assistingCard, inputs, outputs, pollution)) {
+//            return false;
+//        }
+//
+//        // 2. EXECUTION PHASE - perform the complete assistance transaction
+//        executeAssistanceTransaction(card, grid, assistingPlayer, assistingCard, inputs, outputs, pollution);
+//        return true;
 
     }
 
