@@ -36,7 +36,6 @@ public class ArbitraryBasic implements Effect {
     @Override
     public boolean check(List<Resource> input, List<Resource> output, int pollution) {
         if (input.size() >= from && pollution == 0) {
-            if (input.contains(Resource.Pollution)) return false;
             return new HashSet<>(to).containsAll(output);
         }
         else return false;
