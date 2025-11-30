@@ -51,8 +51,8 @@ public class Grid implements InterfaceActivateGrid{
             return false;
         }
 
-        // Check if position is already occupied by another car
-        if(!cards.containsKey(coordinate)){
+        // Check if the position is already occupied by another card
+        if(cards.containsKey(coordinate)){
             return false;
         }
         // Count how many cards are already in the same row and column

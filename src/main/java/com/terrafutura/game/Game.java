@@ -1,6 +1,7 @@
 package main.java.com.terrafutura.game;
 
 import main.java.com.terrafutura.api.TerraFuturaInterface;
+import main.java.com.terrafutura.api.TerraFuturaObserverInterface;
 import main.java.com.terrafutura.board.ActivationPattern;
 import main.java.com.terrafutura.board.Grid;
 import main.java.com.terrafutura.board.GridPosition;
@@ -12,21 +13,37 @@ import main.java.com.terrafutura.resources.Resource;
 import main.java.com.terrafutura.scoring.Points;
 import main.java.com.terrafutura.scoring.ScoringMethod;
 
+
 import java.util.*;
 
+
+/**
+ * Main game controller implementing the Terra Futura board game logic.
+ * Manages game state transitions, player turns, card actions, and scoring.
+ * Implements the state machine as specified in the design documentation.
+ *
+ * @see TerraFuturaInterface
+ */
 public class Game implements TerraFuturaInterface {
     private GameState currentState;
-    private int[] playerIDs;
-    private GameObserver observer;
-    private Map<Integer,Player> players;
-    private TurnManger turnManager;
-    private Random rnd = new Random();
-    private Pile pile1;
-    private Pile pile2;
-    private CardFactory cardFactory;
+    private final int[] playerIDs;
+    private final GameObserver observer;
+    private final Map<Integer,Player> players;
+    private final TurnManager turnManager;
+    private final Random rnd = new Random();
+    private final Pile pile1;
+    private final Pile pile2;
     private SelectReward selectReward;
     private ProcessActionAssistance processActionAssistance;
 
+    /**
+     * Constructs a new Terra Futura game with specified number of players and starting player.
+     * Initializes all game components including players, grids, card piles, and observers.
+     *
+     * @param playerCount the number of players (must be between 2 and 4)
+     * @param startingPlayerID the ID of the player who starts the game
+     * @throws IllegalArgumentException if playerCount is invalid or startingPlayerID is not valid for the player count
+     */
     public Game(int playerCount, int startingPlayerID){
         if (playerCount < 2 || playerCount > 4){
             throw new IllegalArgumentException("Player count must be between 2 and 4");
@@ -36,18 +53,23 @@ public class Game implements TerraFuturaInterface {
             throw new IllegalArgumentException("Starting player must be between 1 and player count");
         }
 
+        // Initialize player IDs and observers
+        Map<Integer, TerraFuturaObserverInterface> observers = new HashMap<>();
         this.playerIDs = new int[playerCount];
         for (int i = 0; i < playerCount; i++){
             playerIDs[i] = i + 1;
+            observers.put(i+1, new ConsoleObserver(i+1));
         }
-
+        this.observer = new GameObserver(observers);
         this.currentState = GameState.TakeCardNoCardDiscarded;
+        notifyObservers();
         this.players = new HashMap<>();
-        this.turnManager = new TurnManger(playerIDs, startingPlayerID);
-        this.cardFactory = new CardFactory();
+        this.turnManager = new TurnManager(playerIDs, startingPlayerID);
+        CardFactory cardFactory = new CardFactory();
         this.pile1 = new Pile(cardFactory.createLevelIDeck());
         this.pile2 = new Pile(cardFactory.createLevelIIDeck());
 
+        // Initialize each player with starting card, scoring methods and activation patterns
         for(int playerID : playerIDs){
             //The third argument is null because we are implementing a game without assistance.
             //In complete implementation it would be effect with hasAssistance == True;
@@ -59,10 +81,20 @@ public class Game implements TerraFuturaInterface {
 
     }
 
+    /**
+     * Generates a random activation pattern for a player's grid.
+     * @param grid the player's grid for which to generate the pattern
+     * @return a random ActivationPattern
+     */
     private ActivationPattern randomActivationPattern(Grid grid){
         Collection<AbstractMap.SimpleEntry<Integer,Integer>> position = List.of(new AbstractMap.SimpleEntry<>(rnd.nextInt(5) - 2, rnd.nextInt(5) - 2));
         return new ActivationPattern(grid, position);
     }
+
+    /**
+     * Generates a random scoring method with random resources and point value.
+     * @return a random ScoringMethod
+     */
     private ScoringMethod randomScoringMethod(){
         int pointsPerCombination = rnd.nextInt(6);
         List<Resource> resources = new ArrayList<>();
@@ -80,16 +112,34 @@ public class Game implements TerraFuturaInterface {
         return new ScoringMethod(resources,new Points(pointsPerCombination));
     }
 
+    /**
+     * Notifies all observers about the current game state.
+     * Each player receives information about the current state and whether it's their turn.
+     */
+    private void notifyObservers() {
+        Map<Integer, String> states = new HashMap<>();
+        for (int playerId : playerIDs) {
+            String playerState = "State: " + currentState + ", Player: " + playerId + ", On turn: " + (turnManager.isPlayerTurn(playerId));
+            states.put(playerId, playerState);
+        }
+        observer.notifyAll(states);
+    }
 
+    /**
+     * Allows the current player to take a card from the specified source and place it on their grid.
+     * Transitions game state to ActivateCard if successful.
+     *
+     * @param playerID the ID of the player taking the card
+     * @param cardSource the source of the card (deck and index)
+     * @param destination the grid position where to place the card
+     * @return true if the card was successfully taken and placed, false otherwise
+     */
     @Override
     public boolean takeCard(int playerID, CardSource cardSource, GridPosition destination) {
-
-        //it has to be players's turn to take card
         if(!turnManager.isPlayerTurn(playerID)){
             return false;
         }
 
-        //we can only take card in state TakeCardNoCardDiscarded or TakeCardCardDiscarded
         if (currentState != GameState.TakeCardNoCardDiscarded && currentState != GameState.TakeCardCardDiscarded) {
             return false;
         }
@@ -97,12 +147,12 @@ public class Game implements TerraFuturaInterface {
         Player player = players.get(playerID);
         Grid grid = player.getGrid();
 
-        //check if the destination is valid
+        //Check if the destination is valid
         if (!grid.canPutCard(destination)) {
             return false;
         }
 
-        //which pile to take a card from?
+        //Which pile to take a card from?
         Pile targetPile = (cardSource.deck == Deck.I) ? pile1 : pile2;
 
         Optional<Card> cardOpt;
@@ -115,14 +165,23 @@ public class Game implements TerraFuturaInterface {
         Card card = cardOpt.get();
         grid.putCard(destination, card);
 
-        //we must still terminate the card from that position and replace it with a new one if possible
+        // Remove the card from the pile and replace it with a new one if possible
         targetPile.takeCard(cardSource.index);
 
         currentState = GameState.ActivateCard;
+        notifyObservers();
 
         return true;
     }
 
+    /**
+     * Allows the current player to discard the last card from the specified deck.
+     * Transition game state to TakeCardCardDiscarded if successful.
+     *
+     * @param playerID the ID of the player discarding the card
+     * @param deck the deck from which to discard the last card
+     * @return true if the card was successfully discarded, false otherwise
+     */
     @Override
     public boolean discardCard(int playerID, Deck deck) {
         if(!turnManager.isPlayerTurn(playerID)){
@@ -139,9 +198,24 @@ public class Game implements TerraFuturaInterface {
             }
         }
         currentState = GameState.TakeCardCardDiscarded;
+        notifyObservers();
         return true;
     }
 
+    /**
+     * Activates a card on the current player's grid, executing its effects.
+     * Handles both regular card activation and Assistance card effects.
+     * For Assistance cards, transitions to SelectReward state for the assisting player.
+     * (NOTE: Assistance functionality is not fully implemented according to assignment requirements)
+     *
+     * @param playerID the ID of the player activating the card
+     * @param card the grid position of the card to activate
+     * @param inputs list of resource-position pairs used as input for the card effect
+     * @param outputs list of resource-position pairs produced as output from the card effect
+     * @param pollution list of grid positions where pollution should be placed
+     * @param otherPlayerId optional ID of another player involved in Assistance effect
+     * @param otherCard optional grid position of another player's card for Assistance effect
+     */
     @Override
     public void activateCard(int playerID, GridPosition card, List<Pair<Resource, GridPosition>> inputs,
                              List<Pair<Resource, GridPosition>> outputs, List<GridPosition> pollution,
@@ -157,11 +231,6 @@ public class Game implements TerraFuturaInterface {
         Player player = players.get(playerID);
         Grid grid = player.getGrid();
 
-        if (!hasMoreCardsToActivate(grid)) {
-            currentState = GameState.TakeCardNoCardDiscarded;
-            return;
-        }
-
         if (!grid.canBeActivated(card)){
             return;
         }
@@ -171,10 +240,8 @@ public class Game implements TerraFuturaInterface {
             return;
         }
         Card cardToActivate = cardOpt.get();
-        boolean success;
 
-        // NOTE: Assistance functionality is not fully implemented according to assignment requirements
-        // The following block shows how Assistance WOULD work if implemented completely
+        // The following block shows how Assistance would work if implemented completely
         if (cardToActivate.hasAssistance() && otherPlayerId.isPresent() && otherCard.isPresent()) {
             int assistingPlayer = otherPlayerId.get();
             // Get the assisting card from the OTHER player's grid
@@ -185,50 +252,29 @@ public class Game implements TerraFuturaInterface {
             Card assistingCard = assistingCardOpt.get();
 
             this.processActionAssistance = new ProcessActionAssistance();
-            success = processActionAssistance.activateCard(cardToActivate, grid, assistingPlayer, assistingCard, inputs, outputs, pollution);
+            if(processActionAssistance.activateCard(cardToActivate, grid, assistingPlayer, assistingCard, inputs, outputs, pollution)) {
 
-            if (success) {
                 // State transition for Assistance - the player who owns the copied card selects a reward
                 selectReward = processActionAssistance.getSelectReward();
                 currentState = GameState.SelectReward;
+                notifyObservers();
             }
-        }else {
-            ProcessAction processAction = new ProcessAction();
-             success = processAction.activateCard(cardToActivate, grid, inputs, outputs, pollution);
         }
-
-        if (success){
-            grid.setActivated(card);
-            // Check if there are any more cards that can be activated in the grid
-            if (hasMoreCardsToActivate(grid)) {
-                // Stay in ActivateCard state for more activations
-                currentState = GameState.ActivateCard;
-            } else {
-                // No more cards to activate - transition to card drawing for next player
-                currentState = GameState.TakeCardNoCardDiscarded;
+        else {
+            ProcessAction processAction = new ProcessAction();
+            if (processAction.activateCard(cardToActivate, grid, inputs, outputs, pollution)) {
+                grid.setActivated(card);
             }
         }
     }
 
     /**
-     * Checks if there are any cards in the grid that can still be activated this turn
-     * This allows players to activate multiple cards in one turn if they wish
+     * Allows a player to select a reward after an Assistance card effect.
+     * Transitions game state back to ActivateCard after reward selection.
+     *
+     * @param playerID the ID of the player selecting the reward
+     * @param resource the resource selected as reward
      */
-    private boolean hasMoreCardsToActivate(Grid grid) {
-        // Check all possible grid positions (-2 to +2 in both X and Y)
-        for (int x = -2; x <= 2; x++) {
-            for (int y = -2; y <= 2; y++) {
-                GridPosition pos = new GridPosition(x, y);
-                if (grid.canBeActivated(pos)) {
-                    // Found at least one card that can still be activated
-                    return true;
-                }
-            }
-        }
-        // No more cards can be activated this turn
-        return false;
-    }
-
     @Override
     public void selectReward(int playerID, Resource resource) {
         if (currentState != GameState.SelectReward || selectReward == null){
@@ -241,24 +287,112 @@ public class Game implements TerraFuturaInterface {
         processActionAssistance = null;
         selectReward = null;
         currentState = GameState.ActivateCard;
+        notifyObservers();
     }
 
+    /**
+     * Ends the current player's turn and advances to the next player.
+     * Checks if the game should end (after 9 turns) and transitions to appropriate state.
+     *
+     * @param playerID the ID of the player ending their turn
+     * @return true if the turn was successfully ended, false otherwise
+     */
     @Override
     public boolean turnFinished(int playerID) {
         if(!turnManager.isPlayerTurn(playerID)){
             return false;
         }
+        if (currentState != GameState.ActivateCard) {
+            return false;
+        }
+        Player player = players.get(playerID);
+        player.getGrid().endTurn();
 
-        return false;
+        turnManager.nextTurn();
+
+        if (turnManager.getTurnNumber() == 9){
+            currentState = GameState.SelectActivationPattern;
+            notifyObservers();
+        }else {
+            currentState = GameState.TakeCardNoCardDiscarded;
+            notifyObservers();
+        }
+
+        return true;
     }
 
+    /**
+     * Allows a player to select an activation pattern for the final activation phase.
+     * When all players have selected a pattern, transitions to ActivateCard state.
+     *
+     * @param playerID the ID of the player selecting the pattern
+     * @param card which pattern to select (1 or 2)
+     * @return true if the pattern was successfully selected, false otherwise
+     */
     @Override
     public boolean selectActivationPattern(int playerID, int card) {
-        return false;
+        if(currentState != GameState.SelectActivationPattern){
+            return false;
+        }
+
+        Player player = players.get(playerID);
+        ActivationPattern selected;
+        switch (card){
+            case 1: selected = player.getActivationPattern1(); break;
+            case 2: selected = player.getActivationPattern2(); break;
+            default: return false;
+        }
+
+        selected.select();
+
+        boolean allSelected = true;  // Check if all players have selected at least one activation pattern
+        for (Player p : players.values()){
+            if (!p.getActivationPattern1().isSelected() && !p.getActivationPattern2().isSelected()){
+                allSelected = false;
+                break;
+            }
+        }
+        if (allSelected){
+            currentState = GameState.ActivateCard;
+            notifyObservers();
+        }
+
+        return true;
     }
 
+    /**
+     * Allows a player to select a scoring method for final scoring.
+     * Immediately transitions game to Finish state after selection.
+     * Note: Unlike activation patterns, scoring method selection is individual and doesn't wait for other players.
+     *
+     * @param playerID the ID of the player selecting the scoring method
+     * @param card which scoring method to select (1 or 2)
+     * @return true if the scoring method was successfully selected, false otherwise
+     */
     @Override
     public boolean selectScoring(int playerID, int card) {
-        return false;
+        if (currentState != GameState.SelectScoringMethod) {
+            return false;
+        }
+
+        Player player = players.get(playerID);
+        ScoringMethod selected;
+        switch (card) {
+            case 1:
+                selected = player.getScoreMethod1();
+                break;
+            case 2:
+                selected = player.getScoreMethod2();
+                break;
+            default:
+                return false;
+        }
+
+        selected.selectThisMethodAndCalculate();
+
+        currentState = GameState.Finish;
+        notifyObservers();
+
+        return true;
     }
 }
