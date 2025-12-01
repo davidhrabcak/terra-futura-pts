@@ -232,6 +232,7 @@ public class GameIntegrationTest {
         g.turnFinished(1);
         assertEquals(0, g.getOnTurn());
         assertEquals(2, g.getTurnNumber());
-        System.out.println("Game: full turn was executed and all involved methods are functional");
+        System.out.println("Game: full turn was executed and all involved methods are functional," +
+                " turn counter increments correctly");
     }
 }
