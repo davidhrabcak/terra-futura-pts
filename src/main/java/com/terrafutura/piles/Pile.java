@@ -15,6 +15,13 @@ public class Pile {
         initializePile();
     }
 
+    public Pile() { //used for testing
+        pile = new ArrayList<>(List.of(new Card(List.of(), 0), new Card(List.of(), 0),
+                new Card(List.of(), 0), new Card(List.of(), 0)));
+        visibleCards = new ArrayList<>();
+        initializePile();
+    }
+
     public Pile(long seed, Card ... cards) {
         pile = new ArrayList<>(List.of(cards));
         Random r = new Random(seed);
@@ -25,7 +32,9 @@ public class Pile {
 
     private void initializePile() {
         for (int i = 0; i < 4; i++) {
-            visibleCards.addFirst(Optional.of(pile.removeLast()));
+            if (!pile.isEmpty()) {
+                visibleCards.addFirst(Optional.of(pile.removeLast()));
+            }
         }
     }
 
@@ -38,7 +47,9 @@ public class Pile {
         if (index > visibleCards.size()-1 ) return Optional.empty();
         Optional<Card> removed = visibleCards.remove(index);
         if (pile.isEmpty()) visibleCards.add(Optional.empty());
-        else visibleCards.addFirst(Optional.of(pile.removeLast()));
+        else {
+            visibleCards.addFirst(Optional.of(pile.removeLast()));
+        }
         return removed;
     }
 

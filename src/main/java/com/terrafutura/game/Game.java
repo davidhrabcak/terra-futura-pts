@@ -31,10 +31,9 @@ public class Game implements TerraFuturaInterface {
     private final GameObserver observers;
     private final MoveCard m = new MoveCard(); // used in takeCard
 
-
     public Game(int playerNumber, int startingPlayerIndex, List<GameObserver> observers, long seed) {
-        i = new Pile(seed); // mock use - in real implementation, the actual cards
-        ii = new Pile(seed);// would be stored in some data class
+        i = new Pile(); // mock use - in real implementation, a different (implemented)
+        ii = new Pile();// constructor would be used and cards would be stored in some data class
         if (playerNumber < 2 || playerNumber > 4) {
             throw new IllegalArgumentException("Game: Invalid number of players");
         }
@@ -53,6 +52,9 @@ public class Game implements TerraFuturaInterface {
             });
         }
         this.observers = new GameObserver(map);
+    }
+    public GameState getState() { // used in integration test
+        return state;
     }
 
     private Player setupPlayer(int id) {

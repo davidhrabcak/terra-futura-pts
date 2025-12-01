@@ -25,7 +25,7 @@ public class MoveCard {
         if (!grid.canPutCard(gridCoordinate)) {
             return false;
         }
-        pile.takeCard(0); // predpokladám, že takeCard odstrani kartu z pile
+        if (pile.takeCard(0).isEmpty()) return false; // predpokladám, že takeCard odstrani kartu z pile
 
         grid.putCard(gridCoordinate, card);
 
