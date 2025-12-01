@@ -17,15 +17,12 @@ public class Game implements TerraFuturaInterface {
         return onTurn;
     }
 
-    public int getStartingPlayer() { // used in gameObservers
-        return startingPlayer;
-    }
-
     public int getTurnNumber() { // used in gameObservers
         return turnNumber;
     }
 
-    private int onTurn, startingPlayer, turnNumber; // startingPlayer only used by GUI
+    private int onTurn, turnNumber;
+    public int startingPlayer; // I don't think it will be needed anywhere, but leaving it public won't ruin anything
     private final ProcessActionAssistance paa; // used in activateCard and selectReward
     private final Pile i, ii;
     private final GameObserver observers;
