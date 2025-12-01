@@ -69,11 +69,7 @@ public class ProcessActionAssistance {
         if (!helper.validateOutputs(outputs, grid)) {
             return false;
         }
-        if (!helper.validatePollution(pollution, grid)) {
-            return false;
-        }
-
-        return true; // Assistance validation successful
+        return helper.validatePollution(pollution, grid);// Assistance validation successful
     }
 
     /**
@@ -81,5 +77,11 @@ public class ProcessActionAssistance {
      */
     private boolean isCardActivatable(Card card){
         return !card.getResources().isEmpty() && card.canGetResources(card.getResources());
+    }
+
+    public boolean canSelectReward(Resource resource) { return true;
+    }
+
+    public void selectReward(Resource resource) {
     }
 }

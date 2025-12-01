@@ -1,7 +1,6 @@
 package main.java.com.terrafutura.board;
 
 import main.java.com.terrafutura.cards.Card;
-import main.java.com.terrafutura.cards.ProcessAction;
 
 import java.util.*;
 
@@ -10,6 +9,7 @@ public class Grid implements InterfaceActivateGrid {
     private final Set<GridPosition> activated;
     private ActivationPattern activationPattern;
     private boolean onTurn;
+    private boolean empty = true;
 
     public Grid() {
         grid = new HashMap<>(9);
@@ -35,6 +35,10 @@ public class Grid implements InterfaceActivateGrid {
 
     public boolean canPutCard(GridPosition coordinate) {
         if (!onTurn) return false;
+        if (empty) {
+            empty = false;
+            return true;
+        }
         if (getCard(new GridPosition(coordinate.getX(), coordinate.getY() + 1)).isPresent()
                 || getCard(new GridPosition(coordinate.getX() + 1, coordinate.getY())).isPresent()
                 || getCard(new GridPosition(coordinate.getX() - 1, coordinate.getY())).isPresent()
@@ -49,7 +53,10 @@ public class Grid implements InterfaceActivateGrid {
         if (!onTurn) {
             return Optional.empty();
         }
-        return grid.getOrDefault(coordinate, Optional.empty());
+        if (coordinate.getX() <= 2 || coordinate.getX() >= -2 || coordinate.getY() <= 2 || coordinate.getY() >= -2) {
+            return grid.getOrDefault(coordinate, Optional.empty());
+        }
+        return Optional.empty();
     }
 
     public boolean canBeActivated(GridPosition coordinate) {
