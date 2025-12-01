@@ -7,62 +7,90 @@ import main.java.com.terrafutura.resources.Resource;
 import java.util.List;
 
 /**
- * Class for VALIDATING card activation with assistance effect
- * ONLY CHECKS if assistance activation is possible - NO EXECUTION
- * Special validation rules for starting card effect copying
+ * Placeholder class for assistance card activation functionality
+ * According to project requirements: "Simplified rules, no Assistance card effect"
+ * This class exists to maintain interface consistency but ALWAYS rejects assistance activations
+ * ASSISTANCE FUNCTIONALITY IS INTENTIONALLY DISABLED in this simplified version of Terra Futura.
+ * The full game rules include complex assistance mechanics where players can use other players'
+ * card effects, but for this implementation we follow the simplified rules specification.
  */
 public class ProcessActionAssistance {
     private final ActionHelper helper = new ActionHelper();
+    private SelectReward selectReward;
 
     /**
-     * VALIDATES if assistance activation is possible
+     * Validates and executes assistance activation including reward selection
      * @param card Starting card to be activated (must have assistance)
      * @param grid Game board
-     * @param assistingPlayer ID of player whose card we're copying
+     * @param assistingPlayer ID of the player whose card we're copying
      * @param assistingCard Card whose effect we're copying
      * @param inputs Input resources + positions (payment for transformation)
      * @param outputs Output resources + positions
      * @param pollution Positions for pollution placement (goes to our card)
-     * @return true if assistance activation is VALID, false otherwise
+     * @return true if assistance activation was successfully executed, false otherwise
      */
     public boolean activateCard(Card card, Grid grid, int assistingPlayer, Card assistingCard,
                                 List<Pair<Resource, GridPosition>> inputs,
                                 List<Pair<Resource, GridPosition>> outputs,
                                 List<GridPosition> pollution) {
+        // In the full game, this would allow using another player's card effect,
+        // but for this implementation we follow the simplified rules specification.
+        return false;
 
-        // 1. Assistance-specific VALIDATION checks
+//        // 1. VALIDATION PHASE - check if assistance activation is possible
+//        if (!validateAssistanceActivation(card, grid, assistingPlayer, assistingCard, inputs, outputs, pollution)) {
+//            return false;
+//        }
+//
+//        // 2. EXECUTION PHASE - perform the complete assistance transaction
+//        executeAssistanceTransaction(card, grid, assistingPlayer, assistingCard, inputs, outputs, pollution);
+//        return true;
 
-        // Validate assisting player (2-4 based on player count)
-        if (assistingPlayer < 2 || assistingPlayer > 4 || assistingCard == null) {
+    }
+
+    /**
+     * Validates all assistance-specific rules and constraints
+     */
+    private boolean validateAssistanceActivation(Card card, Grid grid, int assistingPlayer, Card assistingCard,
+                                                 List<Pair<Resource, GridPosition>> inputs,
+                                                 List<Pair<Resource, GridPosition>> outputs,
+                                                 List<GridPosition> pollution) {
+
+        // 1. Assistance-specific validation checks
+        if (assistingPlayer < 1 || assistingPlayer > 4 || assistingCard == null) {
             return false;
         }
 
-        // Activated card must be starting card (has assistance)
+        if (helper.nullEntry(grid, card, inputs, outputs, pollution)) {
+            return false;
+        }
+
         if (!card.hasAssistance()) {
             return false;
         }
 
-        // Card we're copying must be activatable
-        if (!isCardActivatable(assistingCard)) {
+        // Card must be active (not blocked by pollution)
+        //if we can't add anything, we the cards is blocked
+        if (!assistingCard.canPutResources(List.of())){
             return false;
         }
 
-        // Must have at least 1 resource in inputs for assisting player reward
-        if (helper.extractResources(inputs).isEmpty()) {
-            return false;
-        }
-
-        // 2. Validate transformation using ASSISTING CARD
+        // Must have at least 1 resource in inputs for helping player reward
         List<Resource> inputResources = helper.extractResources(inputs);
-        List<Resource> outputResources = helper.extractResources(outputs);
-        if (!assistingCard.check(inputResources, outputResources, pollution.size())) {
-            return false; // Assisting card must support this transformation
-        }
-
-        // 3. Common validation checks via helper (same as in ProcessAction)
-        if (helper.nullEntry(grid, card, inputs, outputs, pollution)) {
+        if (inputResources.isEmpty()) {
             return false;
         }
+
+        // 2. Validate transformation using ASSISTING CARD (try both effects)
+        List<Resource> outputResources = helper.extractResources(outputs);
+        int assistingCardPollution = (int)assistingCard.getResources().stream().filter(r -> r == Resource.Pollution).count();
+        if (!assistingCard.check(inputResources, outputResources, assistingCardPollution)) {
+            if (!assistingCard.checkLower(inputResources, outputResources, assistingCardPollution)) {
+                return false; // Helping card must support this transformation
+            }
+        }
+
+        // 3. Common validation checks
         if (!helper.validateInputs(inputs, grid)) {
             return false;
         }
@@ -73,13 +101,51 @@ public class ProcessActionAssistance {
             return false;
         }
 
-        return true; // Assistance validation successful
+        return true;
     }
 
     /**
-     * CHECKS if card is activatable (not locked by pollution, etc.)
+     * Executes the complete assistance transaction including reward setup
      */
-    private boolean isCardActivatable(Card card){
-        return !card.getResources().isEmpty() && card.canGetResources(card.getResources());
+    private void executeAssistanceTransaction(Card card, Grid grid, int assistingPlayer, Card assistingCard,
+                                              List<Pair<Resource, GridPosition>> inputs,
+                                              List<Pair<Resource, GridPosition>> outputs,
+                                              List<GridPosition> pollution) {
+
+        // PHASE 1: Remove input resources from source cards (payment for transformation)
+        for (Pair<Resource, GridPosition> input : inputs) {
+            grid.getCard(input.getSecond())
+                    .ifPresent(sourceCard -> sourceCard.removeResource(input.getFirst()));
+        }
+
+        // PHASE 2: Setup reward selection for assisting player
+        // (The actual reward selection happens later via selectReward.selectReward())
+        List<Resource> paidResources = helper.extractResources(inputs);
+        this.selectReward = new SelectReward();
+        selectReward.setReward(assistingPlayer, card, paidResources.toArray(new Resource[0]));
+
+        // PHASE 3: Add output resources to target cards (result of transformation)
+        for (Pair<Resource, GridPosition> output : outputs) {
+            grid.getCard(output.getSecond())
+                    .ifPresent(targetCard -> targetCard.putResources(List.of(output.getFirst())));
+        }
+
+        // PHASE 4: Add pollution tokens (go to the starting card being activated)
+        for (GridPosition pollutionPos : pollution) {
+            grid.getCard(pollutionPos).ifPresent(targetCard -> targetCard.putResources(List.of(Resource.Pollution)));
+        }
+    }
+    public boolean canSelectReward(Resource resource) {
+        return selectReward != null && selectReward.canSelectReward(resource);
+    }
+    public void selectReward(Resource resource) {
+        if (selectReward == null) {
+            throw new IllegalStateException("No reward available to select");
+        }
+        selectReward.selectReward(resource);
+        selectReward = null;
+    }
+    public boolean hasRewardAvailable() {
+        return selectReward != null;
     }
 }
