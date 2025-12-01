@@ -45,6 +45,8 @@ public class Card {
         return false;
     }
 
+    public boolean removeResource(Resource resource) {return false;}
+
     public boolean hasAssistance() {
         return false;
     }

@@ -1,10 +1,11 @@
 package main.java.com.terrafutura.board;
 
 import main.java.com.terrafutura.cards.Card;
+import main.java.com.terrafutura.cards.ProcessAction;
 
 import java.util.*;
 
-public class Grid implements InterfaceActivateGrid{
+public class Grid implements InterfaceActivateGrid {
     private final HashMap<GridPosition, Optional<Card>> grid;
     private final Set<GridPosition> activated;
     private ActivationPattern activationPattern;
@@ -21,7 +22,9 @@ public class Grid implements InterfaceActivateGrid{
     }
 
     public ActivationPattern getActivationPattern() {
-        return activationPattern;
+        if (onTurn) {
+            return activationPattern;
+        } else return null;
     }
 
     public void putCard(GridPosition coordinate, Card card) {
@@ -32,10 +35,10 @@ public class Grid implements InterfaceActivateGrid{
 
     public boolean canPutCard(GridPosition coordinate) {
         if (!onTurn) return false;
-        if (getCard(new GridPosition(coordinate.getX(), coordinate.getY()+1)).isPresent()
-            || getCard(new GridPosition(coordinate.getX()+1, coordinate.getY())).isPresent()
-            || getCard(new GridPosition(coordinate.getX()-1, coordinate.getY())).isPresent()
-            || getCard(new GridPosition(coordinate.getX(), coordinate.getY()-1)).isPresent()) {
+        if (getCard(new GridPosition(coordinate.getX(), coordinate.getY() + 1)).isPresent()
+                || getCard(new GridPosition(coordinate.getX() + 1, coordinate.getY())).isPresent()
+                || getCard(new GridPosition(coordinate.getX() - 1, coordinate.getY())).isPresent()
+                || getCard(new GridPosition(coordinate.getX(), coordinate.getY() - 1)).isPresent()) {
 
             Optional<Card> res = grid.getOrDefault(coordinate, Optional.empty());
             return res.isEmpty();
@@ -44,7 +47,6 @@ public class Grid implements InterfaceActivateGrid{
 
     public Optional<Card> getCard(GridPosition coordinate) {
         if (!onTurn) {
-            System.err.println("Player not on turn");
             return Optional.empty();
         }
         return grid.getOrDefault(coordinate, Optional.empty());
@@ -55,7 +57,7 @@ public class Grid implements InterfaceActivateGrid{
         return !activated.contains(coordinate);
     }
 
-    public void setActivated(GridPosition coordinate) {
+    public void setActivated(GridPosition coordinate) { // for testing
         if (onTurn) {
             activated.add(coordinate);
         }
@@ -72,19 +74,36 @@ public class Grid implements InterfaceActivateGrid{
     }
 
     public String state() {
+        Set<GridPosition> positions = grid.keySet();
+
+        if (positions.isEmpty()) { // no cards
+            return ". . .\n. . .\n. . .";
+        }
+
+        // bounding box of placed cards
+        int minX = positions.stream().mapToInt(GridPosition::getX).min().orElse(0);
+        int maxX = positions.stream().mapToInt(GridPosition::getX).max().orElse(0);
+        int minY = positions.stream().mapToInt(GridPosition::getY).min().orElse(0);
+        int maxY = positions.stream().mapToInt(GridPosition::getY).max().orElse(0);
+
+        // Clamp bounding box to at most 3×3
+        int width = maxX - minX + 1;
+        int height = maxY - minY + 1;
+
+        if (width > 3 || height > 3) {
+            throw new IllegalStateException("More than 3×3 occupied area cannot be displayed");
+        }
+
         StringBuilder sb = new StringBuilder();
 
-        for (int y = 0; y < 3; y++) {
-            for (int x = 0; x < 3; x++) {
+        for (int y = minY; y <= maxY; y++) {
+            for (int x = minX; x <= maxX; x++) {
                 GridPosition pos = new GridPosition(x, y);
                 Optional<Card> opt = grid.getOrDefault(pos, Optional.empty());
-
-                String cell = opt.map(Card::state).orElse(".");
-                sb.append(cell);
-
-                if (x < 2) sb.append(" ");
+                sb.append(opt.map(Card::state).orElse("."));
+                if (x < maxX) sb.append(" ");
             }
-            if (y < 2) sb.append("\n");
+            if (y < maxY) sb.append("\n");
         }
 
         return sb.toString();

@@ -29,7 +29,6 @@ public class ProcessActionAssistanceTest {
         @Override
         public void putResources(List<Resource> resources) {}
 
-        @Override
         public boolean canPutResources(List<Resource> resources) {
             return true;
         }
@@ -40,7 +39,7 @@ public class ProcessActionAssistanceTest {
         }
 
         @Override
-        public void removeResource(Resource resource) {}
+        public boolean removeResource(Resource resource) { return false;}
 
         @Override
         public List<Resource> getResources() {
@@ -70,7 +69,7 @@ public class ProcessActionAssistanceTest {
     private static class SimpleGrid extends Grid {
 
         public SimpleGrid(Card startingCard) {
-            super(startingCard);
+            super();
         }
 
         @Override

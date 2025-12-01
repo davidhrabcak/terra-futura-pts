@@ -63,11 +63,6 @@ public class ActionHelperTest {
         }
 
         @Override
-        public void removeResource(Resource resource) {
-            resources.remove(resource);
-        }
-
-        @Override
         public List<Resource> getResources() {
             return new ArrayList<>(resources);
         }
@@ -94,7 +89,7 @@ public class ActionHelperTest {
         private final Set<GridPosition> invalidPositions = new HashSet<>();
 
         public FakeGrid(Card startingCard) {
-            super(startingCard);
+            super();
         }
 
         public void placeCard(GridPosition position, Card card) {

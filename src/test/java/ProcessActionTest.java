@@ -10,10 +10,7 @@ import main.java.com.terrafutura.resources.Resource;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -38,7 +35,7 @@ public class ProcessActionTest {
         private final Effect lowerEffect;
 
         public FakeCard(int pollutionSpaces, Effect upperEffect, Effect lowerEffect, boolean hasAssistance) {
-            super(pollutionSpaces, upperEffect, lowerEffect);
+            super(pollutionSpaces, Optional.of(upperEffect), Optional.of(lowerEffect));
             this.pollutionSpaces = pollutionSpaces;
             this.upperEffect = upperEffect;
             this.lowerEffect = lowerEffect;
@@ -66,10 +63,10 @@ public class ProcessActionTest {
             return new HashSet<>(resources).containsAll(resourcesToGet);
         }
 
-
         @Override
-        public void removeResource(Resource resource) {
+        public boolean removeResource(Resource resource) {
             resources.remove(resource);
+            return true;
         }
 
         @Override
@@ -112,7 +109,7 @@ public class ProcessActionTest {
         private final java.util.Map<GridPosition, Card> cards = new java.util.HashMap<>();
 
         public FakeGrid(Card startingCard) {
-            super(startingCard);
+            super();
         }
 
         @Override

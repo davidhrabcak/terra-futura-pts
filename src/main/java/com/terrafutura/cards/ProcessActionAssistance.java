@@ -122,7 +122,7 @@ public class ProcessActionAssistance {
         // (The actual reward selection happens later via selectReward.selectReward())
         List<Resource> paidResources = helper.extractResources(inputs);
         this.selectReward = new SelectReward();
-        selectReward.setReward(assistingPlayer, card, paidResources.toArray(new Resource[0]));
+        selectReward.setReward(assistingPlayer, card, paidResources.stream().toList());
 
         // PHASE 3: Add output resources to target cards (result of transformation)
         for (Pair<Resource, GridPosition> output : outputs) {
