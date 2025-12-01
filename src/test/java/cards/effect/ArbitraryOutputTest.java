@@ -24,6 +24,7 @@ public class ArbitraryOutputTest {
 
         assertTrue(ok);
         assertEquals(2, output.size());
+        System.out.println("ArbitraryOutput: check passes when transaction is valid");
     }
 
     @Test
@@ -34,6 +35,7 @@ public class ArbitraryOutputTest {
         List<Resource> output = List.of(gear, gear);
 
         assertFalse(effect.check(input, output, 0));
+        System.out.println("ArbitraryOutput: check fails with invalid input");
     }
     
     @Test
@@ -44,6 +46,7 @@ public class ArbitraryOutputTest {
         List<Resource> output = List.of(gear, gear, gear); // too many resources
 
         assertFalse(effect.check(input, output, 0));
+        System.out.println("ArbitraryOutput: check fails with invalid output");
     }
 
     @Test
@@ -56,11 +59,13 @@ public class ArbitraryOutputTest {
         boolean polluted = effect.check(input, output, 1);
 
         assertFalse(polluted);
+        System.out.println("ArbitraryOutput: check fails if card is polluted");
     }
 
     @Test
     public void testStateString() {
         ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2);
         assertEquals("[(Gear Car ) -> (any 2 resources)]", effect.state());
+        System.out.println("ArbitraryOutput: state() works correctly");
     }
 }

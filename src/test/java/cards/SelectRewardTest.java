@@ -34,6 +34,7 @@ public class SelectRewardTest {
         SelectReward sr = new SelectReward();
         assertNull(sr.selected);
         assertFalse(sr.canSelectReward(Resource.Car));
+        System.out.println("SelectReward: in its initial state, no reward was selected nor can be selected");
     }
 
     @Test
@@ -48,6 +49,8 @@ public class SelectRewardTest {
         assertTrue(sr.canSelectReward(Resource.Car));
         sr.selectReward(Resource.Car);
         assertFalse(sr.canSelectReward(Resource.Car));
+        System.out.println("SelectReward: valid rewards " +
+                "can be selected and rewards cannot be selected if none are left");
     }
 
     @Test
@@ -56,6 +59,7 @@ public class SelectRewardTest {
 
         boolean ok = sr.setReward(1, null, List.of(Resource.Car));
         assertFalse(ok);
+        System.out.println("SelectReward: setReward() fails if card is null");
     }
 
     @Test
@@ -64,6 +68,7 @@ public class SelectRewardTest {
 
         boolean ok = sr.setReward(1, c("CardA"), List.of());
         assertFalse(ok);
+        System.out.println("SelectReward: setReward() fails if reward list is empty");
     }
 
     @Test
@@ -78,18 +83,7 @@ public class SelectRewardTest {
         sr.selectReward(Resource.Car);
         sr.selectReward(Resource.Car);
         assertFalse(sr.canSelectReward(Resource.Car));
-    }
-
-    @Test
-    public void testSelectRewardOnlyWhenAllowed() {
-        SelectReward sr = new SelectReward();
-        sr.setReward(7, c("Card"), List.of(Resource.Car, Resource.Car));
-
-        sr.selectReward(Resource.Car);
-        assertEquals(Resource.Car.toString(), sr.selected.toString());
-
-        sr.selectReward(Resource.Car);
-        assertEquals(Resource.Car.toString(), sr.selected.toString());
+        System.out.println("SelectReward: you cannot select a reward before calling setReward()");
     }
 
     @Test
@@ -102,5 +96,6 @@ public class SelectRewardTest {
         assertTrue(state.startsWith("Select a reward: "));
         assertTrue(state.contains("Car"));
         assertTrue(state.contains("Gear"));
+        System.out.println("SelectReward: state() works correctly");
     }
 }

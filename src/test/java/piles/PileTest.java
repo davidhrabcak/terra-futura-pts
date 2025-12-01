@@ -35,6 +35,7 @@ public class PileTest {
         Pile pile = new Pile(123, c("A"), c("B"), c("C"), c("D"), c("E"));
 
         assertNotEquals(Optional.empty(), pile.takeCard(3));
+        System.out.println("Pile: Initialization takes three cards from pile");
     }
 
     @Test
@@ -55,9 +56,10 @@ public class PileTest {
         assertTrue(second.isPresent());
         assertTrue(third.isPresent());
 
-        // Check they are distinct
         assertNotEquals(first.get(), second.get());
         assertNotEquals(second.get(), third.get());
+        System.out.println("Pile: Visible cards are distinct from each other after initalization");
+
     }
 
     @Test
@@ -67,6 +69,7 @@ public class PileTest {
         Optional<Card> c = pile.getCard(0);
         assertTrue(c.isPresent());
         assertTrue(c.get().state().startsWith("["));
+        System.out.println("Pile: getCard() returns card with valid index");
     }
 
     @Test
@@ -75,6 +78,7 @@ public class PileTest {
 
         assertEquals(Optional.empty(), pile.getCard(999));
         assertEquals(Optional.empty(), pile.getCard(4));
+        System.out.println("Pile: getCard() returns empty if index is invalid");
     }
 
     @Test
@@ -85,6 +89,7 @@ public class PileTest {
 
         assertTrue(taken.isPresent());
         assertEquals(Optional.empty(), pile.getCard(3));
+        System.out.println("Pile: takeCard() removes the card from visibleCards");
     }
 
     @Test
@@ -93,15 +98,17 @@ public class PileTest {
 
         assertNotEquals(Optional.empty(), pile.getCard(3));
         assertFalse(pile.removeLastCard());
+        System.out.println("Pile: removeLastCard() fails when pile is empty");
     }
 
     @Test
-    public void testStateConcatenatesVisibleCardStates() {
+    public void testState() {
         Pile pile = new Pile(5, c("A"), c("B"), c("C"), c("D"));
 
         String state = pile.state();
 
         assertTrue(state.startsWith("["));
         assertEquals(4, state.chars().filter(ch -> ch == '[').count());
+        System.out.println("Pile: state works correctly");
     }
 }

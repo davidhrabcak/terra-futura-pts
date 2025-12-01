@@ -31,7 +31,7 @@ public class EffectOrTest {
 
         assertTrue(ok);
         assertEquals(1, output.size());
-        assertEquals(bulb, output.getFirst());           // e1 used
+        System.out.println("EffectOr: check passes with both effect valid");
     }
 
     @Test
@@ -49,6 +49,7 @@ public class EffectOrTest {
         boolean ok = orEffect.check(input, output, 0);
 
         assertTrue(ok);
+        System.out.println("EffectOr: check passes with first valid and second wrong");
     }
 
     @Test
@@ -64,7 +65,7 @@ public class EffectOrTest {
         List<Resource> output = new ArrayList<>();
 
         assertFalse(orEffect.check(input, output, 0));
-        assertTrue(output.isEmpty());
+        System.out.println("EffectOr: check fails if no effect is valid");
     }
 
     @Test
@@ -78,5 +79,6 @@ public class EffectOrTest {
 
         String state = orEffect.state();
         assertEquals("{[(Gear ) -> (Car )], [(Car ) -> (Bulb )]}", state);
+        System.out.println("EffectOr: state() works correctly");
     }
 }

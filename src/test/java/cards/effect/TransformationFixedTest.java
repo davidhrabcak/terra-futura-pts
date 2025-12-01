@@ -26,6 +26,7 @@ public class TransformationFixedTest {
         assertTrue(ok);
         assertEquals(1, output.size());
         assertEquals(car, output.getFirst());
+        System.out.println("TransformationFixed: check passes with valid transaction");
     }
 
     @Test
@@ -37,6 +38,7 @@ public class TransformationFixedTest {
         List<Resource> output = List.of(car);
 
         assertFalse(effect.check(input, output, 0));
+        System.out.println("TransformationFixed: check fails with invalid input");
     }
 
     @Test
@@ -48,6 +50,7 @@ public class TransformationFixedTest {
         List<Resource> output = new ArrayList<>();
 
         assertFalse(effect.check(input, output, 0));
+        System.out.println("TransformationFixed: check fails with invalid output");
     }
 
     @Test
@@ -59,6 +62,7 @@ public class TransformationFixedTest {
         List<Resource> output = List.of(car);
 
         assertFalse(effect.check(input, output, 1));
+        System.out.println("TransformationFixed: check fails when card is polluted");
     }
 
     @Test
@@ -67,5 +71,6 @@ public class TransformationFixedTest {
                 new TransformationFixed(List.of(gear, car), List.of(car), 0);
 
         assertEquals("[(Gear Car ) -> (Car )]", effect.state());
+        System.out.println("TransformationFixed: state() works correctly");
     }
 }

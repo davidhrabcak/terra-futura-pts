@@ -1,13 +1,11 @@
 package main.java.com.terrafutura.piles;
 
 import main.java.com.terrafutura.cards.Card;
-
-import javax.swing.text.html.Option;
 import java.util.*;
 
 public class Pile {
     private final List<Card> pile;
-    List<Optional<Card>> visibleCards; // visibleCards are not in pile anymore
+    List<Optional<Card>> visibleCards; // visibleCards are not in pile
 
     public Pile(long seed) { // for testing
         Random r = new Random(seed);

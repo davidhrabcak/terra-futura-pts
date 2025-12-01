@@ -40,6 +40,7 @@ public class GridTest {
         assertFalse(grid.canBeActivated(new GridPosition(1, 1)));
         assertNull(grid.getActivationPattern());
         assertEquals(Optional.empty(), grid.getCard(new GridPosition(1, 1)));
+        System.out.println("Grid: operations cannot be performed outside of player's turn");
     }
 
     @Test
@@ -50,6 +51,7 @@ public class GridTest {
         grid.putCard(new GridPosition(0, 0), c("Card"));
         assertTrue(grid.getCard(new GridPosition(0, 0)).isPresent());
         assertEquals("[Card]", grid.getCard(new GridPosition(0, 0)).get().state());
+        System.out.println("Grid: putCard puts card on the correct position");
     }
 
     @Test
@@ -62,6 +64,7 @@ public class GridTest {
         grid.putCard(new GridPosition(0,0), c("Different Card"));
         assertTrue(grid.getCard(new GridPosition(0, 0)).isPresent());
         assertEquals("[Card]", grid.getCard(new GridPosition(0, 0)).get().state());
+        System.out.println("Grid: putCard() cannot put a card on an occupied position");
     }
 
     @Test
@@ -73,6 +76,7 @@ public class GridTest {
         assertTrue(grid.canPutCard(new GridPosition(0, 1)));
         assertFalse(grid.canPutCard(new GridPosition(0, 0)));
         assertFalse(grid.canPutCard(new GridPosition(1, 1)));
+        System.out.println("Grid: canPutCard() works correctly");
     }
 
     @Test
@@ -85,6 +89,7 @@ public class GridTest {
         assertEquals(Optional.empty(), grid.getCard(new GridPosition(1, 1)));
         assertTrue(grid.getCard(new GridPosition(0, 0)).isPresent());
         assertEquals("[Card]", grid.getCard(new GridPosition(0, 0)).get().state());
+        System.out.println("Grid: getCard() works correctly");
     }
 
     @Test
@@ -98,6 +103,7 @@ public class GridTest {
         grid.setActivated(new GridPosition(0, 0));
 
         assertFalse(grid.canBeActivated(new GridPosition(0, 0)));
+        System.out.println("Grid: canBeActivated() works correctly");
     }
 
     @Test
@@ -105,23 +111,27 @@ public class GridTest {
         Grid grid = new Grid();
 
         String expected =
-                ". . .\n" +
-                ". . .\n" +
-                ". . .";
+                    """
+                        . . .
+                        . . .
+                        . . .""";
 
         assertEquals(expected, grid.state());
+        System.out.println("Grid: state() works correctly with empty grid");
     }
 
     @Test
     public void testSingleCardAtCenter() {
         Grid grid = new Grid();
         grid.beginTurn();
-        grid.putCard(new GridPosition(0, 0), c("A"));
+        grid.putCard(new GridPosition(1, 0), c("A"));
 
         String expected =
                 "[A]";
 
         assertEquals(expected, grid.state());
+        System.out.println("Grid: state() works correctly with a single card in the center of the grid" +
+                "and bounding box shrinks correctly");
     }
 
     @Test
@@ -135,6 +145,7 @@ public class GridTest {
                 "[A] [B]";
 
         assertEquals(expected, grid.state());
+        System.out.println("Grid: state() works with 2 cards next to each other");
     }
 
     @Test
@@ -151,6 +162,7 @@ public class GridTest {
                         "[C] [D]";
 
         assertEquals(expected, grid.state());
+        System.out.println("Grid: state() works with a 2x2 block of cards");
     }
 
     @Test
@@ -165,6 +177,7 @@ public class GridTest {
                         "[B]";
 
         assertEquals(expected, grid.state());
+        System.out.println("Grid: bounding box behaviour of state() works correctly");
     }
 
     @Test
@@ -178,5 +191,6 @@ public class GridTest {
                 "[X] [Y]";
 
         assertEquals(expected, grid.state());
+        System.out.println("Grid: negative coordinates function correctly in state()");
     }
 }

@@ -24,6 +24,7 @@ public class ArbitraryInOutTest {
         assertTrue(ok);
         assertEquals(1, output.size());
         assertEquals(gear, output.getFirst());
+        System.out.println("ArbitraryInOut: check passes with correct transaction");
     }
 
     @Test
@@ -34,6 +35,7 @@ public class ArbitraryInOutTest {
         List<Resource> output = Arrays.asList(gear, gear);
 
         assertFalse(effect.check(input, output, 0));
+        System.out.println("ArbitraryInOut: check fails when output is the wrong size");
     }
 
     @Test
@@ -43,6 +45,7 @@ public class ArbitraryInOutTest {
         boolean wrongIn = effect.check(List.of(gear), List.of(gear), 0);
 
         assertFalse(wrongIn);
+        System.out.println("ArbitraryInOut: check fails when input size is invalid");
     }
 
     @Test
@@ -54,11 +57,13 @@ public class ArbitraryInOutTest {
 
         boolean polluted = effect.check(input, output, 1);
         assertFalse(polluted);
+        System.out.println("ArbitraryInOut: check fails if card is polluted");
     }
 
     @Test
     public void testStateFormat() {
         ArbitraryInOut effect = new ArbitraryInOut(3, 2);
         assertEquals("[(any 3 resources) -> (any 2 resources)]", effect.state());
+        System.out.println("ArbitraryInOut: state works correctly");
     }
 }

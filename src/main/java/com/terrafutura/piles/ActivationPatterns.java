@@ -8,7 +8,7 @@ import java.util.*;
 public class ActivationPatterns {
     private final List<ActivationPattern> activationPatterns;
 
-    public ActivationPatterns(Grid g) { // mock data
+    public ActivationPatterns(Grid g) { // class for storing activation patterns
         Collection<AbstractMap.SimpleEntry<Integer, Integer>> cornerPattern = new ArrayList<>();
         cornerPattern.add(new AbstractMap.SimpleEntry<>(0, 0));
         cornerPattern.add(new AbstractMap.SimpleEntry<>(0, 2));

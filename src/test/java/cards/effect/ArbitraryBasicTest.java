@@ -24,6 +24,7 @@ public class ArbitraryBasicTest {
         boolean ok = effect.check(input, output, 0);
 
         assertTrue(ok);
+        System.out.println("ArbitraryBasic: check passes in a valid transaction");
     }
 
     @Test
@@ -35,6 +36,7 @@ public class ArbitraryBasicTest {
         boolean wrongIn = effect.check(List.of(), output, 0);
 
         assertFalse(wrongIn);
+        System.out.println("ArbitraryBasic: check fails with wrong input");
     }
 
     @Test
@@ -46,6 +48,7 @@ public class ArbitraryBasicTest {
         boolean wrongOut = effect.check(input, List.of(bulb, bulb, bulb), 0);
 
         assertFalse(wrongOut);
+        System.out.println("ArbitraryBasic: check fails with wrong output");
     }
 
     @Test
@@ -58,6 +61,7 @@ public class ArbitraryBasicTest {
         boolean polluted = effect.check(input, output, 1);
 
         assertFalse(polluted);
+        System.out.println("ArbitraryBasic: check fails if card is polluted");
     }
 
     @Test
@@ -70,10 +74,12 @@ public class ArbitraryBasicTest {
 
         String s1 = effect1.state();
         assertEquals("[(any 1 resources) -> (Car Bulb Car )]", s1);
+        System.out.println("ArbitraryBasic: state works correctly");
     }
 
     @Test
     public void testAssistanceFlag() {
         assertFalse(new ArbitraryBasic(List.of(bulb)).hasAssistance());
+        System.out.println("ArbitraryBasic: hasAssistance() returns false");
     }
 }

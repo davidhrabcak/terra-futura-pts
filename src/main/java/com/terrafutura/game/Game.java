@@ -67,11 +67,13 @@ public class Game implements TerraFuturaInterface {
         if (onTurn != playerId || (state != GameState.TakeCardCardDiscarded && state != GameState.TakeCardNoCardDiscarded)) return false;
 
         Player p = players.get(playerId);
+        boolean check;
         switch (source.deck) {
-            case I -> m.moveCard(i, destination, p.g); // when MoveCard is implemented correctly,
-            case II -> m.moveCard(ii, destination, p.g);//method call will include the card
+            case I -> check = m.moveCard(i, destination, p.g); // when MoveCard is implemented correctly,
+            case II -> check = m.moveCard(ii, destination, p.g);//method call will include the card
             case null, default -> { return false; }
         }
+        if (!check) return false;
         state = GameState.ActivateCard;
         return true;
     }
@@ -84,7 +86,7 @@ public class Game implements TerraFuturaInterface {
             case I -> success = i.removeLastCard();
             case II -> success = ii.removeLastCard();
             case null, default -> { return false; }
-        };
+        }
         state = GameState.TakeCardCardDiscarded;
         return success;
     }
