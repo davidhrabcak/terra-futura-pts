@@ -65,7 +65,7 @@ public class EffectOrTest {
         List<Resource> output = new ArrayList<>();
 
         assertFalse(orEffect.check(input, output, 0));
-        System.out.println("EffectOr: check fails if no effect is valid");
+        System.out.println("EffectOr: check fails if the pollution output is wrong");
     }
 
     @Test

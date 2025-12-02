@@ -62,7 +62,7 @@ public class TransformationFixedTest {
         List<Resource> output = List.of(car);
 
         assertFalse(effect.check(input, output, 1));
-        System.out.println("TransformationFixed: check fails when card is polluted");
+        System.out.println("TransformationFixed: check fails when the pollution output is wrong");
     }
 
     @Test

@@ -57,7 +57,7 @@ public class ArbitraryInOutTest {
 
         boolean polluted = effect.check(input, output, 1);
         assertFalse(polluted);
-        System.out.println("ArbitraryInOut: check fails if card is polluted");
+        System.out.println("ArbitraryInOut: check fails if if the pollution output is wrong");
     }
 
     @Test
