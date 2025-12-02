@@ -1,15 +1,22 @@
 package main.java.com.terrafutura.scoring;
 
-import com.sun.jdi.IntegerType;
-
 public class Points {
-    public int points;
+
+    private int value;
 
     public Points(int points) {
-        this.points = points;
+        this.value = points;
     }
 
     public void add(Points points) {
-        this.points += points.points;
+        this.value += points.getValue();
+    }
+
+    public void subtract(Points points) {
+        this.value -= points.getValue();
+    }
+
+    public int getValue() {
+        return value;
     }
 }
