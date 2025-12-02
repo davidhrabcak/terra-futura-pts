@@ -14,7 +14,7 @@ public class ArbitraryInOutTest {
 
     @Test
     public void testInputAndOutputArbitraryAndSizeAccepted() {
-        ArbitraryInOut effect = new ArbitraryInOut(2, 1);  // expects input size 2, output size 1
+        ArbitraryInOut effect = new ArbitraryInOut(2, 1, 0);  // expects input size 2, output size 1
 
         List<Resource> input = List.of(gear, gear);
         List<Resource> output = List.of(gear);
@@ -28,7 +28,7 @@ public class ArbitraryInOutTest {
 
     @Test
     public void testInvalidOutputSize() {
-        ArbitraryInOut effect = new ArbitraryInOut(2, 1);
+        ArbitraryInOut effect = new ArbitraryInOut(2, 1, 0);
 
         List<Resource> input = Arrays.asList(gear, gear);
         List<Resource> output = Arrays.asList(gear, gear);
@@ -38,7 +38,7 @@ public class ArbitraryInOutTest {
 
     @Test
     public void testInvalidInputSize() {
-        ArbitraryInOut effect = new ArbitraryInOut(2, 1);  // expects input size 2, output size 1
+        ArbitraryInOut effect = new ArbitraryInOut(2, 1, 0);  // expects input size 2, output size 1
 
         boolean wrongIn = effect.check(List.of(gear), List.of(gear), 0);
 
@@ -47,7 +47,7 @@ public class ArbitraryInOutTest {
 
     @Test
     public void testPolluted() {
-        ArbitraryInOut effect = new ArbitraryInOut(2, 1);  // expects input size 2, output size 1
+        ArbitraryInOut effect = new ArbitraryInOut(2, 1, 0);  // expects input size 2, output size 1
 
         List<Resource> input = Arrays.asList(gear, gear);
         List<Resource> output = Arrays.asList(gear, gear);
@@ -58,7 +58,7 @@ public class ArbitraryInOutTest {
 
     @Test
     public void testStateFormat() {
-        ArbitraryInOut effect = new ArbitraryInOut(3, 2);
+        ArbitraryInOut effect = new ArbitraryInOut(3, 2, 0);
         assertEquals("[(any 3 resources) -> (any 2 resources)]", effect.state());
     }
 }

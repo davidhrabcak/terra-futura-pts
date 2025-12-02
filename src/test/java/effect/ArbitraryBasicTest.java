@@ -19,7 +19,7 @@ public class ArbitraryBasicTest {
 
     @Test
     public void testValidTransaction() {
-        ArbitraryBasic effect = new ArbitraryBasic(List.of(car));
+        ArbitraryBasic effect = new ArbitraryBasic(List.of(car), 0);
 
         List<Resource> input = List.of(bulb, bulb);
         List<Resource> output = new ArrayList<>();
@@ -31,7 +31,7 @@ public class ArbitraryBasicTest {
 
     @Test
     public void testWrongInput() {
-        ArbitraryBasic effect = new ArbitraryBasic(List.of(car));
+        ArbitraryBasic effect = new ArbitraryBasic(List.of(car), 0);
 
         List<Resource> output = new ArrayList<>();
 
@@ -42,7 +42,7 @@ public class ArbitraryBasicTest {
 
     @Test
     public void testWrongOutput() {
-        ArbitraryBasic effect = new ArbitraryBasic(List.of(car));
+        ArbitraryBasic effect = new ArbitraryBasic(List.of(car), 0);
 
         List<Resource> input = List.of(bulb, bulb);
 
@@ -53,7 +53,7 @@ public class ArbitraryBasicTest {
 
     @Test
     public void testPolluted() {
-        ArbitraryBasic effect = new ArbitraryBasic(List.of(car));
+        ArbitraryBasic effect = new ArbitraryBasic(List.of(car), 0);
 
         List<Resource> output = new ArrayList<>();
         List<Resource> input = List.of(bulb, bulb);
@@ -65,8 +65,8 @@ public class ArbitraryBasicTest {
 
     @Test
     public void testStateFormat() {
-        ArbitraryBasic effect = new ArbitraryBasic(List.of(car));
-        ArbitraryBasic effect1 = new ArbitraryBasic(List.of(car, bulb, car));
+        ArbitraryBasic effect = new ArbitraryBasic(List.of(car), 0);
+        ArbitraryBasic effect1 = new ArbitraryBasic(List.of(car, bulb, car), 0);
 
         String s = effect.state();
         assertEquals("[(any 1 resources) -> (Car)]", s);
@@ -77,6 +77,6 @@ public class ArbitraryBasicTest {
 
     @Test
     public void testAssistanceFlag() {
-        assertFalse(new ArbitraryBasic(List.of(bulb)).hasAssistance());
+        assertFalse(new ArbitraryBasic(List.of(bulb), 0).hasAssistance());
     }
 }

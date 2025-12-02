@@ -8,29 +8,32 @@ import java.util.HashSet;
 import java.util.List;
 
 public class ArbitraryBasic implements Effect {
-    private final int from;
+    private final int from, pollution;
     private final List<Resource> to;
     private boolean hasAssistance = false;
 
-    public ArbitraryBasic(List<Resource> resources) { // testing
+    public ArbitraryBasic(List<Resource> resources, int pollution) {
+        this.pollution = pollution; // testing
         from = 1;
         to = new ArrayList<>(resources);
     }
 
-    public ArbitraryBasic(int from, List<Resource> resources) {
+    public ArbitraryBasic(int from, List<Resource> resources, int pollution) {
         this.from = from;
+        this.pollution = pollution;
         to = new ArrayList<>(resources);
     }
 
-    public ArbitraryBasic(int from, List<Resource> resources, boolean hasAssistance) {
+    public ArbitraryBasic(int from, List<Resource> resources,int pollution, boolean hasAssistance) {
         this.from = from;
+        this.pollution = pollution;
         to = new ArrayList<>(resources);
         this.hasAssistance = hasAssistance;
     }
 
     @Override
     public boolean check(List<Resource> input, List<Resource> output, int pollution) {
-        if (input.size() >= from && pollution == 0) {
+        if (input.size() >= from && pollution == this.pollution) {
             return new HashSet<>(to).containsAll(output);
         }
         else return false;

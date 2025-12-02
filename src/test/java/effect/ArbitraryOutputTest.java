@@ -15,7 +15,7 @@ public class ArbitraryOutputTest {
 
     @Test
     public void testStrictInputButArbitraryOutputAllowed() {
-        ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2);
+        ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2, 0);
 
         List<Resource> input = List.of(gear, car);
         List<Resource> output = List.of(gear, gear);   // arbitrary content
@@ -28,7 +28,7 @@ public class ArbitraryOutputTest {
 
     @Test
     public void testInvalidInput() {
-        ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2);
+        ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2, 0);
 
         List<Resource> input = List.of(gear, gear);   // wrong second resource
         List<Resource> output = List.of(gear, gear);
@@ -38,7 +38,7 @@ public class ArbitraryOutputTest {
     
     @Test
     public void testInvalidOutput() {
-        ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2);
+        ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2, 0);
 
         List<Resource> input = List.of(gear, gear);
         List<Resource> output = List.of(gear, gear, gear); // too many resources
@@ -48,7 +48,7 @@ public class ArbitraryOutputTest {
 
     @Test
     public void testPolluted() {
-        ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2);
+        ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2, 0);
 
         List<Resource> input = List.of(gear, car);
         List<Resource> output = List.of(gear, gear);
@@ -60,7 +60,7 @@ public class ArbitraryOutputTest {
 
     @Test
     public void testStateString() {
-        ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2);
+        ArbitraryOutput effect = new ArbitraryOutput(List.of(gear, car), 2, 0);
         assertEquals("[(Gear Car ) -> (any 2 resources)]", effect.state());
     }
 }
