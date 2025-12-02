@@ -44,7 +44,7 @@ public class GameIntegrationTest {
 
     @Test
     public void testInitializeGame() {
-        Game g = new Game(2, 0, List.of(new TestObserver()), 123);
+        Game g = new Game(2, 0, new TestObserver(), 123);
 
         assertEquals(2, g.players.size());
         assertEquals(0, g.getOnTurn());
@@ -55,9 +55,7 @@ public class GameIntegrationTest {
 
     @Test
     public void testTakeCardMovesFromPileToGrid() {
-        TestObserver obs = new TestObserver();
-
-        Game g = new Game(2, 0, List.of(obs), 999);
+        Game g = new Game(2, 0, new TestObserver(), 999);
 
         TestCard c1 = new TestCard("A");
         TestCard c2 = new TestCard("B");
@@ -91,19 +89,44 @@ public class GameIntegrationTest {
 
     @Test
     public void testTakeCardStateProgression() {
-        Game g = new Game(2, 0, List.of(new TestObserver()), 10);
+        Game g = new Game(2, 0, new TestObserver(), 10);
 
         forceState(g, GameState.TakeCardNoCardDiscarded);
         g.players.getFirst().g.beginTurn();
+
+        TestCard c1 = new TestCard("A");
+        TestCard c2 = new TestCard("B");
+        TestCard c3 = new TestCard("C");
+        TestCard c4 = new TestCard("D");
+        TestCard c5 = new TestCard("E");
+
+        Pile predictable = new Pile(1, c1, c2, c3, c4, c5);
+
+        try {
+            var f = Game.class.getDeclaredField("i");
+            f.setAccessible(true);
+            f.set(g, predictable);
+        } catch (Exception e) {
+            fail("failed");
+        }
 
         boolean ok = g.takeCard(0, new CardSource(Deck.I, 0), new GridPosition(0,0));
 
         assertTrue(ok);
         assertEquals(GameState.ActivateCard, g.getState());
 
-        Game g1 = new Game(2, 0, List.of(new TestObserver()), 10);
+        Game g1 = new Game(2, 0, new TestObserver(), 10);
         forceState(g1, GameState.TakeCardCardDiscarded);
         g1.players.getFirst().g.beginTurn();
+
+        try {
+            var f = Game.class.getDeclaredField("i");
+            f.setAccessible(true);
+            f.set(g1, predictable);
+        } catch (Exception e) {
+            fail("failed");
+        }
+
 
         boolean correct = g1.takeCard(0, new CardSource(Deck.I, 0), new GridPosition(1, 0));
 
@@ -114,7 +137,7 @@ public class GameIntegrationTest {
 
     @Test
     public void testIllegalTakeCard() {
-        Game g = new Game(2, 0, List.of(new TestObserver()), 10);
+        Game g = new Game(2, 0, new TestObserver(), 10);
 
         // wrong state
         forceState(g, GameState.SelectScoringMethod);
@@ -132,10 +155,26 @@ public class GameIntegrationTest {
 
     @Test
     public void testGridPlacementRules() {
-        Game g = new Game(2, 0, List.of(new TestObserver()), 15);
+        Game g = new Game(2, 0, new TestObserver(), 15);
 
         forceState(g, GameState.TakeCardNoCardDiscarded);
         g.players.getFirst().g.beginTurn();
+
+        TestCard c1 = new TestCard("A");
+        TestCard c2 = new TestCard("B");
+        TestCard c3 = new TestCard("C");
+        TestCard c4 = new TestCard("D");
+        TestCard c5 = new TestCard("E");
+
+        Pile predictable = new Pile(1, c1, c2, c3, c4, c5);
+
+        try {
+            var f = Game.class.getDeclaredField("i");
+            f.setAccessible(true);
+            f.set(g, predictable);
+        } catch (Exception e) {
+            fail("failed");
+        }
 
         assertTrue(g.takeCard(0, new CardSource(Deck.I, 0), new GridPosition(0,0)));
 
@@ -149,7 +188,7 @@ public class GameIntegrationTest {
 
     @Test
     public void testDiscardCardFlow() {
-        Game g = new Game(2, 0, List.of(new TestObserver()), 7);
+        Game g = new Game(2, 0, new TestObserver(), 7);
 
         TestCard c1 = new TestCard("A");
         TestCard c2 = new TestCard("B");
@@ -180,8 +219,7 @@ public class GameIntegrationTest {
 
     @Test
     public void testTurnRotation() {
-        TestObserver obs = new TestObserver();
-        Game g = new Game(3, 0, List.of(obs), 500);
+        Game g = new Game(3, 0, new TestObserver(), 500);
 
         assertEquals(0, g.getOnTurn());
 
@@ -199,11 +237,27 @@ public class GameIntegrationTest {
 
     @Test
     public void testFullTurnFlow() {
-        Game g = new Game(2, 0, List.of(new TestObserver()), 11);
+        Game g = new Game(2, 0, new TestObserver(), 11);
 
         g.players.getFirst().g.beginTurn();
         g.players.getFirst().g.putCard(new GridPosition(0,0), new TestCard("Root"));
         forceState(g, GameState.TakeCardNoCardDiscarded);
+
+        TestCard c1 = new TestCard("A");
+        TestCard c2 = new TestCard("B");
+        TestCard c3 = new TestCard("C");
+        TestCard c4 = new TestCard("D");
+        TestCard c5 = new TestCard("E");
+
+        Pile predictable = new Pile(1, c1, c2, c3, c4, c5);
+
+        try {
+            var f = Game.class.getDeclaredField("i");
+            f.setAccessible(true);
+            f.set(g, predictable);
+        } catch (Exception e) {
+            fail("failed");
+        }
 
         // take card
         assertTrue(g.takeCard(0, new CardSource(Deck.I, 1), new GridPosition(1,0)));

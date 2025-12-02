@@ -2,8 +2,11 @@ package test.java.piles;
 
 import main.java.com.terrafutura.piles.Pile;
 import main.java.com.terrafutura.cards.Card;
+import main.java.com.terrafutura.resources.Resource;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -99,6 +102,22 @@ public class PileTest {
         assertNotEquals(Optional.empty(), pile.getCard(3));
         assertFalse(pile.removeLastCard());
         System.out.println("Pile: removeLastCard() fails when pile is empty");
+    }
+
+    @Test
+    public void testSeededRandomnessOfPile() {
+        List<Resource> compare = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            Pile pile1 = new Pile(99);
+            assertTrue(pile1.getCard(0).isPresent());
+            compare.add(pile1.getCard(0).get().getResources().getFirst());
+            // 3 cards, each with different resource, so chance of passing the test by luck is (0.3)^100
+        }
+
+        List<Resource> actual = new ArrayList<>();
+        for (int i = 0; i < 100; i++) actual.add(Resource.Money);
+        assertEquals(actual, compare);
+
     }
 
     @Test

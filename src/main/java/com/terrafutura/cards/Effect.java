@@ -3,6 +3,7 @@ package main.java.com.terrafutura.cards;
 import main.java.com.terrafutura.resources.*;
 import java.util.List;
 
+// classes that implement effect enable creating all types (maybe even new ones) of cards that occur in Terra Futura
 public interface Effect {
     /**
      *  Checks input resources, if all required are present and there is no pollution,

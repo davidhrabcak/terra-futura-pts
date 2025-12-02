@@ -1,23 +1,29 @@
 package main.java.com.terrafutura.piles;
 
 import main.java.com.terrafutura.cards.Card;
+import main.java.com.terrafutura.resources.Resource;
+
 import java.util.*;
 
 public class Pile {
     private final List<Card> pile;
     List<Optional<Card>> visibleCards; // visibleCards are not in pile
 
-    public Pile(long seed) { // for testing
+    // actual constructor that would be used, there would also be a data class
+    // that held all the cards in both decks
+    public Pile(long seed) {
         Random r = new Random(seed);
         pile = new ArrayList<>();
+        pile.add(new Card(List.of(Resource.Car), 0));
+        pile.add(new Card(List.of(Resource.Gear), 0));
+        pile.add(new Card(List.of(Resource.Money), 0));
         visibleCards = new ArrayList<>();
         Collections.shuffle(pile, r);
         initializePile();
     }
 
     public Pile() { //used for testing
-        pile = new ArrayList<>(List.of(new Card(List.of(), 0), new Card(List.of(), 0),
-                new Card(List.of(), 0), new Card(List.of(), 0)));
+        pile = new ArrayList<>(); // added two cards just for testing
         visibleCards = new ArrayList<>();
         initializePile();
     }

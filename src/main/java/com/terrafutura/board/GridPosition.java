@@ -1,24 +1,13 @@
 package main.java.com.terrafutura.board;
 
-import java.util.AbstractMap;
 import java.util.Objects;
 
 public class GridPosition {
-    private int x, y;
+    private final int x, y;
 
     public GridPosition(int x, int y) {
             this.x = x;
             this.y = y;
-    }
-
-    public GridPosition(AbstractMap.SimpleEntry<Integer, Integer> c) {
-        if (c.getKey() <= 2 && c.getKey() >= -2) {
-            this.x = c.getKey();
-        }
-        if (c.getValue() <= 2 && c.getValue() >= -2) {
-            this.y = c.getValue();
-        }
-
     }
 
     public int getX() {

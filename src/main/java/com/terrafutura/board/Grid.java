@@ -93,12 +93,16 @@ public class Grid implements InterfaceActivateGrid {
         int minY = positions.stream().mapToInt(GridPosition::getY).min().orElse(0);
         int maxY = positions.stream().mapToInt(GridPosition::getY).max().orElse(0);
 
-        // Clamp bounding box to at most 3×3
+        // bounding box smaller than 3×3
         int width = maxX - minX + 1;
         int height = maxY - minY + 1;
 
+        /* this check should also be in canPutCard, but I didn't find a good way to implement it...
+         so the implementation relies on the GameObserver to print the grid after every grid operation, else
+         the player could create a grid that is not allowed by the rules. Also, if a player does an invalid
+         card placement, there is currently no way to undo it and he basically lost. */
         if (width > 3 || height > 3) {
-            throw new IllegalStateException("More than 3×3 occupied area cannot be displayed");
+            throw new IllegalStateException("More than a 3×3 area cannot be displayed");
         }
 
         StringBuilder sb = new StringBuilder();

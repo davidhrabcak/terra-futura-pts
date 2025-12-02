@@ -50,7 +50,7 @@ public class ArbitraryInOutTest {
 
     @Test
     public void testPolluted() {
-        ArbitraryInOut effect = new ArbitraryInOut(2, 1);  // expects input size 2, output size 1
+        ArbitraryInOut effect = new ArbitraryInOut(2, 1);
 
         List<Resource> input = Arrays.asList(gear, gear);
         List<Resource> output = Arrays.asList(gear, gear);

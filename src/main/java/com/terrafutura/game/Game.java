@@ -1,7 +1,6 @@
 package main.java.com.terrafutura.game;
 
 import main.java.com.terrafutura.api.TerraFuturaInterface;
-import main.java.com.terrafutura.api.TerraFuturaObserverInterface;
 import main.java.com.terrafutura.board.Grid;
 import main.java.com.terrafutura.board.GridPosition;
 import main.java.com.terrafutura.cards.*;
@@ -28,27 +27,24 @@ public class Game implements TerraFuturaInterface {
     private final GameObserver observers;
     private final MoveCard m = new MoveCard(); // used in takeCard
 
-    public Game(int playerNumber, int startingPlayerIndex, List<GameObserver> observers, long seed) {
+    public Game(int playerNumber, int startingPlayerIndex, GameObserver observers, long seed) {
         i = new Pile(); // mock use - in real implementation, a different (implemented)
-        ii = new Pile();// constructor would be used and cards would be stored in some data class
+        ii = new Pile();// constructor Pile(seed) would be used and cards would be stored in some data class
         if (playerNumber < 2 || playerNumber > 4) {
             throw new IllegalArgumentException("Game: Invalid number of players");
         }
         paa = new ProcessActionAssistance();
         state = null;
         this.players = new ArrayList<>();
-        Map<Integer, TerraFuturaObserverInterface> map = new HashMap<>();
         for (int i = 0; i < playerNumber; i++) {
             Player p = setupPlayer(i);
             players.add(p);
             onTurn = startingPlayerIndex;
             startingPlayer = startingPlayerIndex;
             turnNumber = 1;
-            map.put(i, gameState -> {
-                // does something useful to the player
-            });
         }
-        this.observers = new GameObserver(map);
+        // player count is known, so observers can be created before creating Game
+        this.observers = observers;
     }
     public GameState getState() { // used in integration test
         return state;
@@ -98,6 +94,7 @@ public class Game implements TerraFuturaInterface {
 
         boolean check;
 
+        // assistance can be performed
         if (otherPlayerId.isPresent() && otherCard.isPresent()
                 && players.get(otherPlayerId.get()).g.getCard(otherCard.get()).isPresent()) {
             check = paa.activateCard(p.g.getCard(card).get(), p.g, otherPlayerId.get(),
@@ -108,12 +105,12 @@ public class Game implements TerraFuturaInterface {
                 return true;
             }
             return false;
-        } else {
+        } else { // without assistance
             ProcessAction pa = new ProcessAction();
             check = pa.activateCard(p.g.getCard(card).get(), p.g, inputs, outputs, pollution);
         }
         if (!check) return false;
-
+        // only turn where the state should change differently - the rest of the game plays out in turn 9
         if (turnNumber == 9) state = GameState.SelectActivationPattern;
         else turnFinished(playerId);
         return true;
@@ -133,12 +130,12 @@ public class Game implements TerraFuturaInterface {
         if (playerId >= players.size() || onTurn != playerId) return false;
         onTurn = (onTurn + 1 >= players.size()) ? 0 : onTurn + 1;
         observers.notifyAll(Map.of(playerId, "Turn of Player " + playerId + " finished, Player " + onTurn + " is next."));
-        players.get(playerId).g.endTurn();
-        players.get(onTurn).g.beginTurn();
+        players.get(playerId).g.endTurn(); // grid operations safety
+        players.get(onTurn).g.beginTurn(); // grid operations safety
         if (onTurn == 0 && turnNumber != 0) turnNumber++;
-        if (turnNumber > 10) state = GameState.TakeCardNoCardDiscarded;
-        else if (turnNumber == 10) state = GameState.SelectActivationPattern;
-        else state = GameState.SelectScoringMethod;
+        if (turnNumber < 9) state = GameState.TakeCardNoCardDiscarded;
+        else if (turnNumber == 9) state = GameState.SelectActivationPattern; // in case the player
+        else state = GameState.SelectScoringMethod;                          // terminates his turn prematurely
         return true;
     }
 
@@ -169,7 +166,7 @@ public class Game implements TerraFuturaInterface {
             observers.notifyAll(Map.of(playerId, "Selecting scoring method " + p.s2.state()));
             p.s2.selectThisMethodAndCalculate();
         }
-        state = GameState.Finish;
-        return true;
+        state = GameState.Finish; // finish has no states to go to, validation fails
+        return true; //              in all methods - player's game is finished
     }
 }

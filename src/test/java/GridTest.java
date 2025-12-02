@@ -22,7 +22,10 @@ class CardFake extends Card {
         return "[" + name + "]";
     }
 }
-
+/* this test doesn't test the problematic rule of building a 3x3 grid, because although grid can catch
+   the wrong card placement in state(), canPutCard or putCard won't stop you from placing a card that breaks the rules,
+   the game simply throws an exception.
+ */
 public class GridTest {
 
     private CardFake c(String n) { return new CardFake(n); }
