@@ -5,27 +5,25 @@ import java.util.List;
 
 public interface Effect {
     /**
-     *  Checks input resources, if all required are present and there is no pollution,
-     *  removes them from input and adds correct resources to output, adds pollution
-     *  based on effect.
+     *  Checks input resources, if all required are present and there is no pollution.
      * @param input Input resources
      * @param output Puts all gained resources here
      * @param pollution Specifies if card with effect is polluted.
-     * @return If exchange was successful, returns true, else returns false.
+     * @return If exchange is valid, returns true, else returns false.
      */
     boolean check(List<Resource> input, List<Resource> output, int pollution);
 
     /**
      * By the requirements of this implementation, Assistance is not required to implement -
      * not possible on any of the cards.
-     * @return False.
+     * @return False by default, value given in constructor in most implementations.
      */
     default boolean hasAssistance() {
         return false;
     }
 
     /**
-     * Return the effect description [(INPUT RESOURCES) -> (OUTPUT RESOURCES)]
+     * Return  the effect description [(INPUT RESOURCES) -> (OUTPUT RESOURCES)]
      * @return string that describes function of effect
      */
     String state();

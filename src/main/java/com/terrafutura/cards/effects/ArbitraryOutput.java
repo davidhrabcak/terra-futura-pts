@@ -13,15 +13,20 @@ import java.util.List;
 public class ArbitraryOutput implements Effect {
     private final List<Resource> from;
     private final int to;
+    private boolean hasAssistance = false;
+    private final int pollution;
 
-    public ArbitraryOutput(List<Resource> from) {
-        this.from = new ArrayList<>(from);
-        to = 1;
-    }
-
-    public ArbitraryOutput(List<Resource> from, int to) {
+    public ArbitraryOutput(List<Resource> from, int to, int pollution) {
         this.from = new ArrayList<>(from);
         this.to = to;
+        this.pollution = pollution;
+    }
+
+    public ArbitraryOutput(List<Resource> from, int to, boolean hasAssistance, int pollution) {
+        this.from = new ArrayList<>(from);
+        this.to = to;
+        this.hasAssistance = hasAssistance;
+        this.pollution = pollution;
     }
 
     /**
@@ -33,10 +38,15 @@ public class ArbitraryOutput implements Effect {
      */
     @Override
     public boolean check(List<Resource> input, List<Resource> desiredOutput, int pollution) {
-        if (new HashSet<>(input).containsAll(from) && pollution == 0) {
+        if (new HashSet<>(input).containsAll(from) && pollution == this.pollution) {
             return desiredOutput.size() == to;
         }
         return false;
+    }
+
+    @Override
+    public boolean hasAssistance() {
+        return hasAssistance;
     }
 
     @Override

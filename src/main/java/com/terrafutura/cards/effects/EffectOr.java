@@ -7,11 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EffectOr implements Effect {
-    List<Effect> children;
-
-    public EffectOr() {
-        children = new ArrayList<>();
-    }
+    private final List<Effect> children;
 
     public EffectOr(Effect ...children) {
         this.children = new ArrayList<>();

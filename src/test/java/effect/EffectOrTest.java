@@ -37,9 +37,9 @@ public class EffectOrTest {
     @Test
     public void testWrongSecondEffect() {
         TransformationFixed e1 =
-                new TransformationFixed(List.of(gear, bulb), List.of(car), 1); // does not match
+                new TransformationFixed(List.of(gear, bulb), List.of(car), 0); // does not match
         TransformationFixed e2 =
-                new TransformationFixed(List.of(gear, car), List.of(bulb), 1); // matches
+                new TransformationFixed(List.of(gear, car), List.of(bulb), 0); // matches
 
         EffectOr orEffect = new EffectOr(e1, e2);
 
