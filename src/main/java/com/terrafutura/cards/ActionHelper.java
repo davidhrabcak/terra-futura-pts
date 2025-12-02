@@ -4,8 +4,7 @@ import main.java.com.terrafutura.board.Grid;
 import main.java.com.terrafutura.board.GridPosition;
 import main.java.com.terrafutura.resources.Resource;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Helper class containing common validation logic for ProcessAction and ProcessActionAssistance
@@ -13,80 +12,130 @@ import java.util.List;
  */
 public class ActionHelper {
 
+
     /**
-     * CHECKS if any of the required parameters is null
+     * Checks if any required parameters are null before proceeding with validation
+     * @return true if any parameter is null, false if all parameters are valid objects
      */
     public boolean nullEntry(Grid grid, Card card, List<Pair<Resource, GridPosition>> inputs,
                              List<Pair<Resource, GridPosition>> outputs, List<GridPosition> pollution) {
         return grid == null || card == null || inputs == null || outputs == null || pollution == null;
     }
+    /**
+     * Checks if coaordinations are valid
+     * @param position to check
+     * @return true if the position is valid, false if it is invalid
+     * */
+    private boolean inValidCoordinations(GridPosition position){
+        int x = position.getX();
+        int y = position.getY();
+        return x < -2 || x > 2 || y < -2 || y > 2;
+    }
 
     /**
-     * VALIDATES all input resources - checks positions and resource availability
+     * Validates all input resources - checks positions and resource availability
+     * @return false if the position is invalid, has no card, or card cannot provide the resource
      */
     public boolean validateInputs(List<Pair<Resource, GridPosition>> inputs, Grid grid) {
         for (Pair<Resource, GridPosition> input : inputs) {
             Resource resource = input.getFirst();
             GridPosition position = input.getSecond();
-            if (!grid.canPutCard(position)) {
-                return false; // Invalid position
+
+            // Check if the position is valid and if grid contains a card (canPutCard=true means empty position)
+            if (grid.canPutCard(position) || inValidCoordinations(position)){
+                return false;
             }
-            Card card = grid.getCard(position).get();
-            if (card == null || !card.canGetResources(List.of(resource))) {
-                return false; // Cannot get resources
+
+            Optional<Card> cardOpt = grid.getCard(position);
+            if (cardOpt.isEmpty() || !cardOpt.get().canGetResources(List.of(resource))) {
+                return false; // Card doesn't exist or cannot provide the required resource
             }
         }
         return true;
     }
 
     /**
-     * VALIDATES all output resources - checks positions and card capacity
+     * Validates all output resources - checks positions and card capacity
+     * @return false if the position is invalid, has no card, or card cannot accept the resource
      */
     public boolean validateOutputs(List<Pair<Resource, GridPosition>> outputs, Grid grid) {
         for (Pair<Resource, GridPosition> output : outputs) {
             Resource resource = output.getFirst();
             GridPosition position = output.getSecond();
-            if (!grid.canPutCard(position)) {
-                return false; // Invalid position
+
+            // Check if the position is valid and if grid contains a card
+            if (grid.canPutCard(position) || inValidCoordinations(position)){
+                return false;
             }
-            if (grid.getCard(position).isEmpty()) return false; // ak mergeujes a toto je konflikt,
-            Card card = grid.getCard(position).get();           // je to nepotrebne, fixuje tvoj bug aby som
-            if  (!card.canPutResources(List.of(resource))) {    // mohol spustat testy.
-                return false; // Cannot add resources
+            Optional<Card> cardOpt = grid.getCard(position);
+            if (cardOpt.isEmpty() || !cardOpt.get().canPutResources(List.of(resource))) {
+                return false; // Card doesn't exist or cannot accept the resource
             }
         }
         return true;
     }
 
     /**
-     * VALIDATES pollution positions - checks if positions exist and have cards
+     * Validates pollution positions - checks if positions exist and cards can accept pollution
+     * @return false if the position is invalid, has no card, or card cannot accept more pollution
      */
     public boolean validatePollution(List<GridPosition> pollution, Grid grid) {
+        // Group pollution by card where it should go
+        Map<Card, Integer> pollutionPerCard = new HashMap<>();
+
         for (GridPosition position : pollution) {
-            if (!grid.canPutCard(position)) {
-                return false; // Invalid position
+            if (grid.canPutCard(position) || inValidCoordinations(position)) {
+                return false;
             }
-            if (grid.getCard(position) == null) {
-                return false; // No card at position
+            Optional<Card> cardOpt = grid.getCard(position);
+            if (cardOpt.isEmpty()) {
+                return false;
+            }
+            Card card = cardOpt.get();
+
+            // count how much pollution should go to each card
+            pollutionPerCard.put(card, pollutionPerCard.getOrDefault(card, 0) + 1);
+        }
+
+        // check if each card can accept the pollution
+        for (Map.Entry<Card, Integer> entry : pollutionPerCard.entrySet()) {
+            Card card = entry.getKey();
+            int pollutionCount = entry.getValue();
+
+            // list of pollution tokens to add
+            List<Resource> pollutionToAdd = Collections.nCopies(pollutionCount, Resource.Pollution);
+
+            // chceck if the card can accept all the pollution meant to go to it
+            if (!card.canPutResources(pollutionToAdd)) {
+                return false;
             }
         }
+
         return true;
     }
 
     /**
-     * VALIDATES transformation using card.check() method
-     * VERIFIES if card supports the transformation, but DOES NOT execute it
+     * Validates transformation using card.check() method
+     * Verifies if the card supports the transformation but DOES NOT execute it
+     * Tests both upper and lower effects to find a valid transaction pattern
+     * @param upper If true, validates against the upper effect; if false, uses a lower effect
+     * @return true if the card's effect approves the proposed resource transformation
      */
     public boolean validTransaction(Card card, List<Pair<Resource, GridPosition>> inputs,
-                                    List<Pair<Resource, GridPosition>> outputs, List<GridPosition> pollution) {
+                                    List<Pair<Resource, GridPosition>> outputs, List<GridPosition> pollution, boolean upper) {
+        int pollutionFromTransaction = pollution.size();
         List<Resource> inputResources = extractResources(inputs);
         List<Resource> outputResources = extractResources(outputs);
-        return card.check(inputResources, outputResources, pollution.size());
+        if (upper) {
+            return card.check(inputResources, outputResources, pollutionFromTransaction);
+        }else {
+            return card.checkLower(inputResources, outputResources, pollutionFromTransaction);
+        }
     }
 
     /**
-     * Extracts Resources from List<Pair<Resource, GridPosition>>
-     * Used for input transformation for card.check()
+     * Extracts Resource objects from a list of Resource+Position pairs
+     * @return List containing only the Resource objects from the input pairs
      */
     public List<Resource> extractResources(List<Pair<Resource, GridPosition>> pairs) {
         List<Resource> resources = new ArrayList<>();

@@ -1,5 +1,6 @@
 package main.java.com.terrafutura.board;
 
+import java.util.AbstractMap;
 import java.util.Objects;
 
 public class GridPosition {
